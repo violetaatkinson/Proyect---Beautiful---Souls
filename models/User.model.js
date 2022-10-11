@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 
-const ROLLUSER =["FosterHome","Adopter","Owner"]
+const ROLES_USER =["FosterHome","Adopter","Owner"]
 // FosterHome = "casa de refugio" 
 //Adopter = "el que va a adoptar"
 //Owner = "el que crea el anuncio para adoptar"
@@ -29,9 +29,9 @@ const userSchema = new mongoose.Schema(
             required: [true, 'Password is required.'],
             match: [PASSWORD_PATTERN, 'Password must contain at least 8 characters.']
         },
-        roll: {
+        role: {
             type: String,
-            enum: ROLLUSER
+            enum: ROLES_USER
         },
     },
     {
