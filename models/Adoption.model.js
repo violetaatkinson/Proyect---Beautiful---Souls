@@ -3,6 +3,9 @@ const bcrypt = require('bcrypt');
 
 SPECIES = ['Dog','Cat','Reptiles','Birds']
 SIZES = ['Small','Medium','Large']
+GENDER = ['Female','Male']
+
+
 
 const adoptionSchema = new mongoose.Schema({
     name: {
@@ -25,7 +28,8 @@ const adoptionSchema = new mongoose.Schema({
     },
     gender: {
         type: String,
-        required: [true, 'gender is required.']
+        required: [true, 'gender is required.'],
+        enum: GENDER
     },
     image : {
         type: String,

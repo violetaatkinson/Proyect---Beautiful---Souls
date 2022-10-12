@@ -10,7 +10,7 @@ module.exports.list = (req, res, next) => {
   }
 
   module.exports.create = (req, res, next) => {
-    User.create(req.body) // creamos los usuarios con el body del modelo 
+    User.create(req.body) // del front del formulario
       .then(user => // se crea el usuario
          res.status(201).json(user)) // devolvemos el usuario creado
       .catch(next)
