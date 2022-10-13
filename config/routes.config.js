@@ -1,5 +1,6 @@
 const router = require('express').Router();
 
+const fileUploader = require('./cloudinary.config')
 const authMiddleware = require('../middlewares/auth.middleware');
 const authController = require('../controllers/auth.controller');
 const usersController = require('../controllers/users.controller');
@@ -26,8 +27,9 @@ router.get('/users/me', authMiddleware.isAuthenticated, usersController.getCurre
 // ADOPTION
 
 router.get('/adoptions', adoptionController.list) // veo todas las adopciones que hay diponibles
-router.post('/adoptions/create',authMiddleware.isAuthenticated ,adoptionController.createAdoption)
+router.post('/adoptions/create',authMiddleware.isAuthenticated , fileUploader.single('image'), adoptionController.createAdoption)
 router.get('/adoptions/:id', adoptionController.detail)
+
 
 
 

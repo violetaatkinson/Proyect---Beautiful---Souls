@@ -1,6 +1,7 @@
 const createError = require('http-errors');
 const Adoption = require('../models/Adoption.model')
 
+
 module.exports.list = (req, res, next) => {
     Adoption.find() // buscamos las adopciones
       .then(adoptions => { // promesa las encontramos
@@ -15,7 +16,17 @@ module.exports.list = (req, res, next) => {
         ...req.body,
         user: req.currentUser // buscamos el curent user
       };
+    
+    
+      const adoption = {
+        ...req.body,
+        creator: user
+      };
 
+
+      if (req.file) {
+        adoption.image = req.file.path;
+      }
      
     Adoption.create(user) // creamos una adopcion con el curent user
         .then(adoption => { // se crea la adopcion 
@@ -36,12 +47,9 @@ module.exports.list = (req, res, next) => {
         }) .catch(next)
   }
 
- 
-  
+
 
  
-
-  
 
 
 
