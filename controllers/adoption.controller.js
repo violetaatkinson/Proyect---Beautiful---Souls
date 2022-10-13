@@ -1,5 +1,7 @@
 const createError = require('http-errors');
 const Adoption = require('../models/Adoption.model')
+const Like = require('../models/Like.model')
+const Comment = require('../models/Comment.model')
 
 
 module.exports.list = (req, res, next) => {
@@ -47,9 +49,23 @@ module.exports.list = (req, res, next) => {
         }) .catch(next)
   }
 
+module.exports.commentList = (req, res, next) => {
+  Comment.find()
+   .populate('user')
+   .then(comments => {
+      res.json(comments)
+   })
+   .catch(next)
+}
 
 
- 
+module.exports.likesList = (req, res, next) => {
+  Like.find()
+   .then(like => {
+      res.json(like)
+   })
+   .catch(next)
+}
 
 
 

@@ -9,13 +9,12 @@ const adoptionController = require('../controllers/adoption.controller')
 
 router.get('/', (req, res, next) => res.json({ ok: true }));
 
-// create y list de modelo comment
-// create y list de modelo like
+// create de modelo comment
+// create de modelo like
 
 // AUTH
 
 router.post('/login', authController.login);
-
 
 // USERS
 
@@ -30,16 +29,11 @@ router.get('/adoptions', adoptionController.list) // veo todas las adopciones qu
 router.post('/adoptions/create',authMiddleware.isAuthenticated , fileUploader.single('image'), adoptionController.createAdoption)
 router.get('/adoptions/:id', adoptionController.detail)
 
+router.get('/comment/:id', authMiddleware.isAuthenticated, adoptionController.commentList)
+//router.post('/comment/:id', authMiddleware.isAuthenticated, adoptionController.comment)
 
-
-
-
-
-
-
-
-
-
+router.get('like/:id', authMiddleware.isAuthenticated, adoptionController.likesList)
+//router.post('like/:id', authMiddleware.isAuthenticated, adoptionController.likes)
 
 
 
