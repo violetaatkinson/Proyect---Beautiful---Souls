@@ -9,13 +9,13 @@ module.exports.list = (req, res, next) => {
       .catch(next)
   }
 
+
   module.exports.createAdoption = (req, res, next) => {
     const user = {
-        ...req.user,
+        ...req.body,
         user: req.currentUser // buscamos el curent user
       };
 
-      console.log(user)
      
     Adoption.create(user) // creamos una adopcion con el curent user
         .then(adoption => { // se crea la adopcion 
@@ -23,6 +23,7 @@ module.exports.list = (req, res, next) => {
         })  
         .catch(next)
   }
+
 
   module.exports.detail = (req, res, next) => {
     Adoption.findById(req.params.id) // encontramos la adopcion x el id

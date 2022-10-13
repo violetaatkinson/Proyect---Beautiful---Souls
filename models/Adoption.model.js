@@ -16,9 +16,9 @@ const adoptionSchema = new mongoose.Schema({
     years : {
         type: Number,
     },
-    species: {
+    specie: {
         type: String,
-        required: [true, 'species is required.'],
+        required: [true, 'specie is required.'],
         enum: SPECIES,
     },
     description: {
