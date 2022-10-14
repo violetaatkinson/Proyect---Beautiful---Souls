@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 
-SPECIES = ['Dog','Cat','Reptiles','Birds']
+SPECIES = ['Dog','Cat','Reptile','Bird']
 SIZES = ['Small','Medium','Large']
 GENDER = ['Female','Male']
 

@@ -1,7 +1,5 @@
 const createError = require('http-errors');
 const Adoption = require('../models/Adoption.model')
-const Like = require('../models/Like.model')
-const Comment = require('../models/Comment.model')
 
 
 module.exports.list = (req, res, next) => {
@@ -11,7 +9,6 @@ module.exports.list = (req, res, next) => {
       })
       .catch(next)
   }
-
 
   module.exports.createAdoption = (req, res, next) => {
     const user = {
@@ -49,24 +46,19 @@ module.exports.list = (req, res, next) => {
         }) .catch(next)
   }
 
-module.exports.commentList = (req, res, next) => {
-  Comment.find()
-   .populate('user')
-   .then(comments => {
-      res.json(comments)
-   })
-   .catch(next)
-}
-
-
-module.exports.likesList = (req, res, next) => {
-  Like.find()
-   .then(like => {
-      res.json(like)
-   })
-   .catch(next)
-}
+// module.exports.filterDogs = (req, res , next) => {
+//   Adoption.find()
+//     .then((result) => result.filter(adoption => adoption.specie.includes('Dog'))) 
+//     .then((filtered) => res.status(200).json(filtered))
+//     .catch(next)
+// }
 
 
 
+
+  module.exports.delete = (req, res, next) => {
+    Adoption.findByIdAndRemove(req.params.id)
+      .then((adoption) => res.status(200).json(adoption))
+      .catch(next);
+  };
 

@@ -2,15 +2,14 @@ const router = require('express').Router();
 
 const fileUploader = require('./cloudinary.config')
 const authMiddleware = require('../middlewares/auth.middleware');
+
 const authController = require('../controllers/auth.controller');
 const usersController = require('../controllers/users.controller');
 const adoptionController = require('../controllers/adoption.controller')
-
+const miscController = require('../controllers/misc.controller')
 
 router.get('/', (req, res, next) => res.json({ ok: true }));
 
-// create de modelo comment
-// create de modelo like
 
 // AUTH
 
@@ -28,12 +27,17 @@ router.get('/users/me', authMiddleware.isAuthenticated, usersController.getCurre
 router.get('/adoptions', adoptionController.list) // veo todas las adopciones que hay diponibles
 router.post('/adoptions/create',authMiddleware.isAuthenticated , fileUploader.single('image'), adoptionController.createAdoption)
 router.get('/adoptions/:id', adoptionController.detail)
+// router.get('/dogs', adoptionController.filterDogs)
 
-router.get('/comment/:id', authMiddleware.isAuthenticated, adoptionController.commentList)
-//router.post('/comment/:id', authMiddleware.isAuthenticated, adoptionController.comment)
+router.delete('/adoptions/:id',authMiddleware.isAuthenticated, adoptionController.delete);
 
-router.get('like/:id', authMiddleware.isAuthenticated, adoptionController.likesList)
-//router.post('like/:id', authMiddleware.isAuthenticated, adoptionController.likes)
+
+// MISC
+
+//router.get('/comment', authMiddleware.isAuthenticated, miscController.commentList)
+//router.post('/comment', authMiddleware.isAuthenticated, miscController.comment)
+//router.get('/like', authMiddleware.isAuthenticated, miscController.likesList)
+//router.post('/like', authMiddleware.isAuthenticated, miscController.likes)
 
 
 
