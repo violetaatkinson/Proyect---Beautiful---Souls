@@ -27,9 +27,9 @@ router.get('/users/me', authMiddleware.isAuthenticated, usersController.getCurre
 router.get('/adoptions', adoptionController.list) // veo todas las adopciones que hay diponibles
 router.post('/adoptions/create',authMiddleware.isAuthenticated , fileUploader.single('image'), adoptionController.createAdoption)
 router.get('/adoptions/:id', adoptionController.detail)
-// router.get('/dogs', adoptionController.filterDogs)
-
-router.delete('/adoptions/:id',authMiddleware.isAuthenticated, adoptionController.delete);
+router.post('/adoptions/:id',authMiddleware.isAuthenticated, adoptionController.edit)
+router.delete('/adoptions/:id',authMiddleware.isAuthenticated, adoptionController.delete)
+//router.get('/dogs', adoptionController.filterDogs)
 
 
 // MISC

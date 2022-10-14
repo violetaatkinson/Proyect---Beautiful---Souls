@@ -26,7 +26,7 @@ module.exports.login = (req, res, next) => {
                   },
                   'Super secret',
                   {
-                    expiresIn: '1h'
+                    expiresIn: '24h'
                   }
                 ) // Firmar y enviar el token jwt
 

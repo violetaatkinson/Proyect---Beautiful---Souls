@@ -46,19 +46,38 @@ module.exports.list = (req, res, next) => {
         }) .catch(next)
   }
 
-// module.exports.filterDogs = (req, res , next) => {
-//   Adoption.find()
-//     .then((result) => result.filter(adoption => adoption.specie.includes('Dog'))) 
-//     .then((filtered) => res.status(200).json(filtered))
-//     .catch(next)
-// }
 
+  module.exports.edit = (req, res, next) => {
+    Adoption.findByIdAndUpdate(req.params.id, req.body, { new: true })
+      .then(adoption => {
+        console.log(adoption, req.body)
+        res.status(200).json(adoption)})
+        .catch(next)
+  }
 
-
-
+  
   module.exports.delete = (req, res, next) => {
     Adoption.findByIdAndRemove(req.params.id)
-      .then((adoption) => res.status(200).json(adoption))
-      .catch(next);
+    .then((adoption) => res.status(200).json(adoption))
+    .catch(next);
   };
-
+  
+  
+  
+  
+  // module.exports.filterDogs = (req, res , next) => {
+  //   Adoption.find()
+  //     .then((result) => result.filter(adoption => adoption.specie.includes('Dog'))) 
+  //     .then((filtered) => res.status(200).json(filtered))
+  //     .catch(next)
+  // }
+  
+  // module.exports.filterDogs = (req, res , next) => {
+  //   Adoption.find()
+  //     .then((result) => {
+  //       result.filter(adoption => adoption.includes('Dog'))
+  //         .then((filtered) => {
+  //           res.status(200).json(filtered)
+  //         })
+  //     }) .catch(next)
+  // }
