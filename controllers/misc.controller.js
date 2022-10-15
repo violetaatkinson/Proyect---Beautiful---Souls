@@ -49,3 +49,10 @@ module.exports.commentList = (req, res, next) => {
         .catch(next)
   }
 
+  module.exports.delete = (req, res , next) => {
+    Comment.findByIdAndRemove(req.params.id)
+      .then((comment) => res.status(200).json(comment))
+      .catch(next);
+  }
+
+
