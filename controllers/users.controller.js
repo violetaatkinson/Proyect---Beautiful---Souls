@@ -45,3 +45,8 @@ module.exports.edit = (req, res, next) => {
     .catch(next)
 }
 
+module.exports.delete = (req, res, next) => {
+  User.findByIdAndRemove(req.params.id)
+  .then((user) => res.status(200).json(user))
+  .catch(next);
+};
