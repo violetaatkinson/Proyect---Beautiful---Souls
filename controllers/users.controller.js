@@ -1,5 +1,6 @@
 const createError = require('http-errors');
 const User = require('../models/User.model');
+const Like = require('../models/Like.model.js')
 
 module.exports.list = (req, res, next) => {
     User.find() // buscamos los usuarios
@@ -49,4 +50,20 @@ module.exports.delete = (req, res, next) => {
   User.findByIdAndRemove(req.params.id)
   .then((user) => res.status(200).json(user))
   .catch(next);
-};
+}
+
+module.exports.profile = (req, res, next) => {
+  console.log(req.currentUser)
+  Like.find({ user: req.currentUser })
+    .populate("adoption")
+    .then(likedAdoption => {
+      res.status(200).json(likedAdoption)})
+      .catch(next)
+}
+
+
+
+
+
+
+

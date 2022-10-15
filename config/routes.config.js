@@ -24,6 +24,7 @@ router.get('/users/:id', authMiddleware.isAuthenticated, usersController.getCurr
 router.post('/users/:id', authMiddleware.isAuthenticated, usersController.edit) // edito mi perfil
 router.delete('/users/:id',authMiddleware.isAuthenticated, usersController.delete) // elimino mi perfil
 
+router.get("/profile", authMiddleware.isAuthenticated, usersController.profile)
 
 // ADOPTION
 
