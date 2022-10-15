@@ -56,3 +56,11 @@ module.exports.commentList = (req, res, next) => {
   }
 
 
+
+  module.exports.edit = (req, res, next) => {
+    Comment.findByIdAndUpdate(req.params.id, req.body, { new: true })
+      .then(comment => {
+        console.log(comment, req.body)
+        res.status(200).json(comment)})
+        .catch(next)
+  }

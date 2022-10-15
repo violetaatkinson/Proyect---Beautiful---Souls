@@ -39,6 +39,7 @@ router.post('/like/:id', authMiddleware.isAuthenticated, miscController.likes)
 
 router.get('/comment/:id', authMiddleware.isAuthenticated, miscController.commentList)
 router.post('/comment/:id', authMiddleware.isAuthenticated, miscController.comment)
+router.post('/comment/:id',authMiddleware.isAuthenticated, miscController.edit)
 router.delete("/comment/:id/delete", authMiddleware.isAuthenticated, miscController.delete)
 
 
