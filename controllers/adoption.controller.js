@@ -3,7 +3,14 @@ const Adoption = require('../models/Adoption.model')
 
 
 module.exports.list = (req, res, next) => {
-    Adoption.find() // buscamos las adopciones
+    const { specie } = req.query
+    const criteria = {}
+
+    if(specie) {
+      criteria.specie = specie
+    }
+
+    Adoption.find(criteria) // buscamos las adopciones
       .then(adoptions => { // promesa las encontramos
         res.json(adoptions)// las devolvemos
       })
@@ -65,19 +72,3 @@ module.exports.list = (req, res, next) => {
   
   
   
-  // module.exports.filterDogs = (req, res , next) => {
-  //   Adoption.find()
-  //     .then((result) => result.filter(adoption => adoption.specie.includes('Dog'))) 
-  //     .then((filtered) => res.status(200).json(filtered))
-  //     .catch(next)
-  // }
-  
-  // module.exports.filterDogs = (req, res , next) => {
-  //   Adoption.find()
-  //     .then((result) => {
-  //       result.filter(adoption => adoption.includes('Dog'))
-  //         .then((filtered) => {
-  //           res.status(200).json(filtered)
-  //         })
-  //     }) .catch(next)
-  // }

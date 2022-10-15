@@ -29,15 +29,16 @@ router.post('/adoptions/create',authMiddleware.isAuthenticated , fileUploader.si
 router.get('/adoptions/:id', adoptionController.detail)
 router.post('/adoptions/:id',authMiddleware.isAuthenticated, adoptionController.edit)
 router.delete('/adoptions/:id',authMiddleware.isAuthenticated, adoptionController.delete)
-//router.get('/dogs', adoptionController.filterDogs)
+
 
 
 // MISC
 
+router.get('/like/:id', authMiddleware.isAuthenticated, miscController.likesList)
+router.post('/like/:id', authMiddleware.isAuthenticated, miscController.likes)
+
 //router.get('/comment', authMiddleware.isAuthenticated, miscController.commentList)
 //router.post('/comment', authMiddleware.isAuthenticated, miscController.comment)
-//router.get('/like', authMiddleware.isAuthenticated, miscController.likesList)
-//router.post('/like', authMiddleware.isAuthenticated, miscController.likes)
 
 
 
