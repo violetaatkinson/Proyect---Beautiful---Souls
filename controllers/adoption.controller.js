@@ -3,11 +3,11 @@ const Adoption = require('../models/Adoption.model')
 
 
 module.exports.list = (req, res, next) => {
-    const { specie } = req.query
+    const { specie } = req.query // url
     const criteria = {}
 
-    if(specie) {
-      criteria.specie = specie
+    if(specie) { // url de specie
+      criteria.specie = specie 
     }
 
     Adoption.find(criteria) // buscamos las adopciones

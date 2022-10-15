@@ -32,7 +32,6 @@ module.exports.likes = (req, res, next) => {
 
 
 
-
 module.exports.commentList = (req, res, next) => {
     Comment.find()
      .populate('user')
@@ -41,3 +40,12 @@ module.exports.commentList = (req, res, next) => {
      })
      .catch(next)
   }
+
+  module.exports.comment = (req, res , next) => {
+    Comment.create(req.body)
+        .then(comment => {
+            res.status(201).json(comment)
+        })
+        .catch(next)
+  }
+

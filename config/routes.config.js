@@ -37,9 +37,9 @@ router.delete('/adoptions/:id',authMiddleware.isAuthenticated, adoptionControlle
 router.get('/like/:id', authMiddleware.isAuthenticated, miscController.likesList)
 router.post('/like/:id', authMiddleware.isAuthenticated, miscController.likes)
 
-//router.get('/comment', authMiddleware.isAuthenticated, miscController.commentList)
-//router.post('/comment', authMiddleware.isAuthenticated, miscController.comment)
-
+router.get('/comment/:id', authMiddleware.isAuthenticated, miscController.commentList)
+router.post('/comment/:id', authMiddleware.isAuthenticated, miscController.comment)
+// tengo que hacer un edit y un delte del comment
 
 
 module.exports = router;
