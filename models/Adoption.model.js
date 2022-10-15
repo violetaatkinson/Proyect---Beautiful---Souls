@@ -40,6 +40,9 @@ const adoptionSchema = new mongoose.Schema({
         required: [true, 'size is required.'],
         enum: SIZES,
     },
+    hobbies:{
+        type:[String]
+    },
     owner: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
