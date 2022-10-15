@@ -10,6 +10,14 @@ module.exports.list = (req, res, next) => {
   }
 
   module.exports.create = (req, res, next) => {
+    const user = {
+      ...req.body,
+    };
+
+    if (req.file) {
+      user.image = req.file.path;
+    }
+    
     User.create(req.body) // del front del formulario
       .then(user => // se crea el usuario
          res.status(201).json(user)) // devolvemos el usuario creado
@@ -27,3 +35,13 @@ module.exports.list = (req, res, next) => {
       })
       .catch(next)
   }
+
+ 
+module.exports.edit = (req, res, next) => {
+  User.findByIdAndUpdate(req.params.id, req.body, { new: true })
+  .then(user => {
+    console.log(user, req.body)
+    res.status(200).json(user)})
+    .catch(next)
+}
+

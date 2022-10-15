@@ -15,11 +15,13 @@ router.get('/', (req, res, next) => res.json({ ok: true }));
 
 router.post('/login', authController.login);
 
+
 // USERS
 
 router.get('/users', usersController.list) // utilizaremos el plural del modelo que vamos a buscar
-router.post('/users', usersController.create) // no ponemos un /create porque POST ya indica creación
-router.get('/users/me', authMiddleware.isAuthenticated, usersController.getCurrentUser)
+router.post('/users', usersController.create) // este seria mi register
+router.get('/users/:id', authMiddleware.isAuthenticated, usersController.getCurrentUser)
+router.post('/users/:id', authMiddleware.isAuthenticated, usersController.edit)
 
 
 // ADOPTION
@@ -29,7 +31,6 @@ router.post('/adoptions/create',authMiddleware.isAuthenticated , fileUploader.si
 router.get('/adoptions/:id', adoptionController.detail)
 router.post('/adoptions/:id',authMiddleware.isAuthenticated, adoptionController.edit)
 router.delete('/adoptions/:id',authMiddleware.isAuthenticated, adoptionController.delete)
-
 
 
 // MISC
