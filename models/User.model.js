@@ -14,7 +14,6 @@ const userSchema = new mongoose.Schema(
 {
         userName: {
             type: String,
-            required: [true, 'userName is required.'],
             minLength: [3, 'userName must contain at least 3 characters.'],
             unique: [true, 'userName must be unique'],
         },
@@ -35,11 +34,11 @@ const userSchema = new mongoose.Schema(
         },
         name : {
             type: String,
-            required: [true, 'name is required.'],
+            
         },
         lastName: {
             type: String,
-            required: [true, 'name is required.'],
+            
         },
         age: {
             type: Number,
@@ -47,7 +46,7 @@ const userSchema = new mongoose.Schema(
         },
         gender: {
             type: String,
-            required: [true, 'gender is required.'],
+            
         },
         image : {
             type: String,
