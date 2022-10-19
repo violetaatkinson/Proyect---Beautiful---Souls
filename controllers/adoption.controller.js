@@ -18,23 +18,16 @@ module.exports.list = (req, res, next) => {
   }
 
   module.exports.createAdoption = (req, res, next) => {
-    const user = {
-        ...req.body,
-        user: req.currentUser // buscamos el curent user
-      };
-    
-    
       const adoption = {
         ...req.body,
-        creator: user
+        owner: req.currentUser
       };
-
 
       if (req.file) {
         adoption.image = req.file.path;
       }
      
-    Adoption.create(user) // creamos una adopcion con el curent user
+    Adoption.create(adoption) // creamos una adopcion con el curent user
         .then(adoption => { // se crea la adopcion 
             res.status(201).json(adoption) // la devolvemos
         })  
