@@ -46,6 +46,10 @@ const adoptionSchema = new mongoose.Schema({
     owner: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
+    },
+    adopted: {
+        type: Boolean,
+        defeault: false
     }
 },
 { toObject: { virtuals: true }

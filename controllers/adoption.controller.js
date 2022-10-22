@@ -2,10 +2,21 @@ const createError = require('http-errors');
 const Adoption = require('../models/Adoption.model');
 const Like = require('../models/Like.model');
 
+module.exports.countAdopted = (req, res, next) => {
+  Adoption.count({ adopted: true })
+    .then(number => res.json({ count: number }))
+}
+
+module.exports.alreadyAdopted = (req, res, next) => {
+  Adoption.find({ adopted: true })
+    .then(adopted => res.json({ adopted: adopted }))
+}
 
 module.exports.list = (req, res, next) => {
     const { specie } = req.query // url
-    const criteria = {}
+    const criteria = {
+      adopted: false
+    }
 
     if(specie) { // url de specie
       criteria.specie = specie 
@@ -43,6 +54,8 @@ module.exports.list = (req, res, next) => {
       if (req.file) {
         adoption.image = req.file.path;
       }
+
+    console.log(req.body, req.file);
      
     Adoption.create(adoption) // creamos una adopcion con el curent user
         .then(adoption => { // se crea la adopcion 
@@ -75,7 +88,10 @@ module.exports.list = (req, res, next) => {
   
   module.exports.delete = (req, res, next) => {
     Adoption.findByIdAndRemove(req.params.id)
-    .then((adoption) => res.status(200).json(adoption))
+    .then((adoption) => {
+      res.status(200).json(adoption)
+      // Aparte habra que buscar los like cuyo adoption sea el adoption._id
+    })
     .catch(next);
   };
   
