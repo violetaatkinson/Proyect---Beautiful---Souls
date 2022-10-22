@@ -28,7 +28,7 @@ router.get("/profile", authMiddleware.isAuthenticated, usersController.profile)
 
 // ADOPTION
 
-router.get('/adoptions', adoptionController.list) // veo todas las adopciones que hay diponibles
+router.get('/adoptions', authMiddleware.isAuthenticated, adoptionController.list) // veo todas las adopciones que hay diponibles
 router.post('/adoptions/create',authMiddleware.isAuthenticated , fileUploader.single('image'), adoptionController.createAdoption)
 router.get('/adoptions/:id', adoptionController.detail)
 router.post('/adoptions/:id',authMiddleware.isAuthenticated, adoptionController.edit)
@@ -37,7 +37,7 @@ router.delete('/adoptions/:id',authMiddleware.isAuthenticated, adoptionControlle
 
 // MISC
 
-router.get('/like/:id', authMiddleware.isAuthenticated, miscController.likesList)
+router.get('/like', authMiddleware.isAuthenticated, miscController.likesList)
 router.post('/like/:id', authMiddleware.isAuthenticated, miscController.likes)
 
 router.get('/comment/:id', authMiddleware.isAuthenticated, miscController.commentList)

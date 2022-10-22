@@ -3,9 +3,11 @@
 
 
  module.exports.likesList = (req, res, next) => {
-     Like.find()
-     .then(like => {
-        res.json(like)
+     Like.find({ user: req.currentUser })
+        .populate('adoption')
+     .then(likes => {
+        console.log(likes)
+        res.json(likes.map(like => like.adoption))
     })
     .catch(next)
 }

@@ -1,5 +1,6 @@
 const createError = require('http-errors');
-const Adoption = require('../models/Adoption.model')
+const Adoption = require('../models/Adoption.model');
+const Like = require('../models/Like.model');
 
 
 module.exports.list = (req, res, next) => {
@@ -10,11 +11,27 @@ module.exports.list = (req, res, next) => {
       criteria.specie = specie 
     }
 
-    Adoption.find(criteria) // buscamos las adopciones
-      .then(adoptions => { // promesa las encontramos
-        res.json(adoptions)// las devolvemos
+    const promises = [
+      Adoption.find(criteria),
+      Like.find({ user: req.currentUser }),
+    ]
+
+    Promise.all(promises)
+      .then(([ adoptions, likes ]) => {
+        const filteredAdoptions = adoptions
+          .filter(adoption => !likes.some(like => like.adoption.toString() === adoption._id.toString()))
+
+          res.json(filteredAdoptions)
       })
       .catch(next)
+
+
+
+    // Adoption.find(criteria) // buscamos las adopciones
+    //   .then(adoptions => { // promesa las encontramos
+    //     res.json(adoptions)// las devolvemos
+    //   })
+    //   .catch(next)
   }
 
   module.exports.createAdoption = (req, res, next) => {
