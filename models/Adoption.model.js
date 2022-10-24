@@ -49,7 +49,7 @@ const adoptionSchema = new mongoose.Schema({
     },
     adopted: {
         type: Boolean,
-        defeault: false
+        default: false
     }
 },
 { toObject: { virtuals: true }

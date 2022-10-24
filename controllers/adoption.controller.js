@@ -2,15 +2,7 @@ const createError = require('http-errors');
 const Adoption = require('../models/Adoption.model');
 const Like = require('../models/Like.model');
 
-module.exports.countAdopted = (req, res, next) => {
-  Adoption.count({ adopted: true })
-    .then(number => res.json({ count: number }))
-}
 
-module.exports.alreadyAdopted = (req, res, next) => {
-  Adoption.find({ adopted: true })
-    .then(adopted => res.json({ adopted: adopted }))
-}
 
 module.exports.list = (req, res, next) => {
     const { specie } = req.query // url
@@ -89,6 +81,9 @@ module.exports.list = (req, res, next) => {
   module.exports.delete = (req, res, next) => {
     Adoption.findByIdAndRemove(req.params.id)
     .then((adoption) => {
+      if (!adoption) {
+        next(createError(404, 'adoption not found'))
+      }
       res.status(200).json(adoption)
       // Aparte habra que buscar los like cuyo adoption sea el adoption._id
     })
@@ -97,4 +92,13 @@ module.exports.list = (req, res, next) => {
   
   
   
+  module.exports.getMyAdoptions = (req, res, next) => {
+  Adoption.find({ 'owner._id': req.currentUser._id })
+    .then((adoptions) => {
+      res.status(200).json(adoptions)
+      // Aparte habra que buscar los like cuyo adoption sea el adoption._id
+    })
+    .catch(next)
+
+  };
   
