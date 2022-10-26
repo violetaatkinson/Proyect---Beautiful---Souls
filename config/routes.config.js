@@ -21,7 +21,7 @@ router.post('/login', authController.login);
 router.get('/users', usersController.list) // utilizaremos el plural del modelo que vamos a buscar
 router.post('/users', usersController.create) // este seria mi register
 router.get('/users/me', authMiddleware.isAuthenticated, usersController.getCurrentUser)
-router.post('/users/:id', authMiddleware.isAuthenticated, usersController.edit) // edito mi perfil
+router.put('/users/:id', authMiddleware.isAuthenticated, fileUploader.single('image'), usersController.edit) // edito mi perfil
 router.delete('/users/:id',authMiddleware.isAuthenticated, usersController.delete) // elimino mi perfil
 
 router.get("/profile", authMiddleware.isAuthenticated, usersController.profile)

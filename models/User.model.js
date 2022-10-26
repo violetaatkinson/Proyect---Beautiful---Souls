@@ -33,6 +33,10 @@ const userSchema = new mongoose.Schema(
             enum: ROLES_USER
         },
         
+        firstName: {
+            type: String,
+            
+        },
         lastName: {
             type: String,
             

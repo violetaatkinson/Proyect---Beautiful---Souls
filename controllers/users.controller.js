@@ -40,9 +40,10 @@ module.exports.list = (req, res, next) => {
  
 module.exports.edit = (req, res, next) => {
   User.findByIdAndUpdate(req.params.id, req.body, { new: true })
-  .then(user => {
-    console.log(user, req.body)
-    res.status(200).json(user)})
+    .then(user => {
+      console.log(user, req.body)
+      res.status(200).json(user)
+    })
     .catch(next)
 }
 
