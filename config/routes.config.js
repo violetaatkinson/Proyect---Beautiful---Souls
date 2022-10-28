@@ -7,6 +7,7 @@ const authController = require('../controllers/auth.controller');
 const usersController = require('../controllers/users.controller');
 const adoptionController = require('../controllers/adoption.controller')
 const miscController = require('../controllers/misc.controller')
+const adoptedController = require('../controllers/adopted.controller')
 
 router.get('/', (req, res, next) => res.json({ ok: true }));
 
@@ -19,7 +20,7 @@ router.post('/login', authController.login);
 // USERS
 
 router.get('/users', usersController.list) // utilizaremos el plural del modelo que vamos a buscar
-router.post('/users', usersController.create) // este seria mi register
+router.post('/users', fileUploader.single('image') , usersController.create) // este seria mi register
 router.get('/users/me', authMiddleware.isAuthenticated, usersController.getCurrentUser)
 router.put('/users/:id', authMiddleware.isAuthenticated, fileUploader.single('image'), usersController.edit) // edito mi perfil
 router.delete('/users/:id',authMiddleware.isAuthenticated, usersController.delete) // elimino mi perfil
@@ -36,7 +37,10 @@ router.post('/adoptions/:id',authMiddleware.isAuthenticated, adoptionController.
 router.delete('/adoptions/:id',authMiddleware.isAuthenticated, adoptionController.delete)
 router.get('/myadoptions',authMiddleware.isAuthenticated, adoptionController.getMyAdoptions )
 
-//router.get('/adopted', authMiddleware.isAuthenticated, adoptionController.alreadyAdopted)
+// ADOPTED
+
+router.post('/adopted/create', authMiddleware.isAuthenticated, fileUploader.single('image'), adoptedController.createAdopted)
+router.get('/adopted', adoptedController.adoptedList)
 
 // MISC
 

@@ -25,6 +25,8 @@ module.exports.list = (req, res, next) => {
       .catch(next)
   }
 
+
+
   module.exports.getCurrentUser = (req, res, next) => {
     User.findById(req.currentUser) // encontramos al user x el id
       .then(user => { // una vez encontrado

@@ -56,6 +56,7 @@ module.exports.list = (req, res, next) => {
         .catch(next)
   }
 
+ 
 
   module.exports.detail = (req, res, next) => {
     Adoption.findById(req.params.id) // encontramos la adopcion x el id
