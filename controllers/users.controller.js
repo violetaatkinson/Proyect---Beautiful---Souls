@@ -41,18 +41,22 @@ module.exports.list = (req, res, next) => {
 
  
 module.exports.edit = (req, res, next) => {
-  User.findByIdAndUpdate(req.params.id, req.body, { new: true })
+  const userToUpdate = req.body
+  if (req.file) {
+    userToUpdate.image = req.file.path;
+  }
+  User.findByIdAndUpdate(req.params.id, userToUpdate, { new: true })
     .then(user => {
-      console.log(user, req.body)
+      console.log(user, userToUpdate)
       res.status(200).json(user)
     })
     .catch(next)
 }
 
 module.exports.delete = (req, res, next) => {
-  User.findByIdAndRemove(req.params.id)
-  .then((user) => res.status(200).json(user))
-  .catch(next);
+  User.findByIdAndDelete(req.params.id)
+    .then((user) => res.status(200).json(user))
+    .catch(next);
 }
 
 module.exports.profile = (req, res, next) => {
