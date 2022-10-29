@@ -4,14 +4,15 @@ const Adopted = require('../models/Adopted.model');
 module.exports.createAdopted  = (req, res, next) => {
     const adopted = {
         ...req.body,
-        owner: req.currentUser
+        
       };
 
+      
       if (req.file) {
         adopted.image = req.file.path;
       }
 
-    console.log(req.body, req.file);
+  
      
     Adopted.create(adopted) // creamos una adopcion con el curent user
         .then(adopted => { // se crea la adopcion 
@@ -23,7 +24,6 @@ module.exports.createAdopted  = (req, res, next) => {
 
 module.exports.adoptedList = (req, res, next) => {
     Adopted.find()
-    .populate('user')
     .then( adoptionList => {
        res.json( adoptionList )
     })
