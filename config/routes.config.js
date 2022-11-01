@@ -8,6 +8,7 @@ const usersController = require('../controllers/users.controller');
 const adoptionController = require('../controllers/adoption.controller')
 const miscController = require('../controllers/misc.controller')
 const adoptedController = require('../controllers/adopted.controller')
+const socketController = require('../controllers/socketcontroller')
 
 router.get('/', (req, res, next) => res.json({ ok: true }));
 
@@ -15,7 +16,6 @@ router.get('/', (req, res, next) => res.json({ ok: true }));
 // AUTH
 
 router.post('/login', authController.login);
-
 
 // USERS
 
@@ -39,8 +39,8 @@ router.get('/myadoptions',authMiddleware.isAuthenticated, adoptionController.get
 
 // ADOPTED
 
-router.post('/adopted/create', authMiddleware.isAuthenticated, fileUploader.single('image'), adoptedController.createAdopted)
 router.get('/adopted', adoptedController.adoptedList)
+router.post('/adopted/create', authMiddleware.isAuthenticated, fileUploader.single('image'), adoptedController.createAdopted)
 
 // MISC
 
@@ -53,4 +53,20 @@ router.post('/comment/:id',authMiddleware.isAuthenticated, miscController.edit)
 router.delete("/comment/:id/delete", authMiddleware.isAuthenticated, miscController.delete)
 
 
+// MESSAGES (SOCKET)
+
+// router.get('/messages', authMiddleware.isAuthenticated, socketController.selectUser)
+// router.get('/message/:username' , authMiddleware.isAuthenticated, socketController.messages)
+// router.post('/message/:username' , authMiddleware.isAuthenticated, socketController.createMessage )
+
+
+// NOTIFICATIONS (SOCKET)
+
+// router.get('/notifications', authMiddleware.isAuthenticated, socketController.notifications )
+
+
+
+
+
 module.exports = router;
+
