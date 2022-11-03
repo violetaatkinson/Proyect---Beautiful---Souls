@@ -4,7 +4,6 @@ const Adopted = require('../models/Adopted.model');
 module.exports.createAdopted  = (req, res, next) => {
     const adopted = {
         ...req.body,
-        owner: req.currentUser
         
       };
 

@@ -1,8 +1,7 @@
-const Message = require('../models/Message.model')
-const Like = require('../models/Like.model.js')
-const Notification = require('../models/Notification.model')
-const User = require('../models/User.model')
-const moment = require('moment');
+// const Message = require('../models/Message.model')
+// const Notification = require('../models/Notification.model')
+// const User = require('../models/User.model')
+// const moment = require('moment');
 
 
 // module.exports.selectUser = (req, res, next) => {
@@ -30,8 +29,8 @@ const moment = require('moment');
 
 //  module.exports.messages = (req, res, next) => {
    
-//     const { username } = req.params;
-//     const currentUser = req.user;
+//     const { username } = req.params
+//     const currentUser = req.user
 
 //     User.findOne({username})
 //         .then((userFound)=> {
@@ -53,18 +52,18 @@ const moment = require('moment');
 
 //  module.exports.createMessage = (req, res, next) => {
     
-//     const currentUser = req.user;
-//     const { username } = req.params;
-//     const { msg } = req.body;
+//     const currentUser = req.user
+//     const { username } = req.params
+//     const { msg } = req.body
 
-//     let msgToSave = {};
+//     let msgToSave = {}
 
-//     msgToSave.sender = currentUser.id;
-//     msgToSave.msg = msg;
+//     msgToSave.sender = currentUser.id
+//     msgToSave.msg = msg
 
 //     User.findOne({ username })
 //         .then((userFound) => {
-//             const userID = userFound.id
+//             const userID = userFound.id;
 //             msgToSave.receiver = userFound.id;
             
 //             Message.create(msgToSave)
@@ -81,6 +80,7 @@ const moment = require('moment');
 //         .catch(next)
 //  }
 
+
 //  module.exports.notifications = (req, res, next) => {
    
 //     const currentUser = req.user
@@ -89,9 +89,9 @@ const moment = require('moment');
 //         .populate('sender')
 //             .then((notifications) => {
 //                 notifications.forEach((notification) => {
-//                     if (notification.type === 'Like') {
+//                     if (notification.typeOf === 'Like') {
 //                         notification.newLike = 'liked your pet'
-//                     } else if (notification.type === 'Comment') {
+//                     } else if (notification.typeOf === 'Comment') {
 //                         notification.newComment = "commented on your post."
 //                     } else {
 //                         notification.newMessage = "messaged you."
@@ -102,4 +102,5 @@ const moment = require('moment');
 //             }) .catch(next)
 //  }
 
+ 
 

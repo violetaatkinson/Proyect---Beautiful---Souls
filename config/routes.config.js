@@ -46,6 +46,7 @@ router.post('/adopted/create', authMiddleware.isAuthenticated, fileUploader.sing
 
 router.get('/like', authMiddleware.isAuthenticated, miscController.likesList)
 router.post('/like/:id', authMiddleware.isAuthenticated, miscController.likes)
+router.post('/dislike/:id', authMiddleware.isAuthenticated, miscController.dislikes)
 
 router.get('/comment/:id', authMiddleware.isAuthenticated, miscController.commentList)
 router.post('/comment/:id', authMiddleware.isAuthenticated, miscController.comment)
@@ -55,14 +56,14 @@ router.delete("/comment/:id/delete", authMiddleware.isAuthenticated, miscControl
 
 // MESSAGES (SOCKET)
 
-// router.get('/messages', authMiddleware.isAuthenticated, socketController.selectUser)
-// router.get('/message/:username' , authMiddleware.isAuthenticated, socketController.messages)
-// router.post('/message/:username' , authMiddleware.isAuthenticated, socketController.createMessage )
+//  router.get('/messages', authMiddleware.isAuthenticated, socketController.selectUser)
+//  router.get('/message/:username' , authMiddleware.isAuthenticated, socketController.messages)
+//  router.post('/message/:username' , authMiddleware.isAuthenticated, socketController.createMessage )
 
 
 // NOTIFICATIONS (SOCKET)
 
-// router.get('/notifications', authMiddleware.isAuthenticated, socketController.notifications )
+ //router.get('/notifications', authMiddleware.isAuthenticated, socketController.notifications )
 
 
 

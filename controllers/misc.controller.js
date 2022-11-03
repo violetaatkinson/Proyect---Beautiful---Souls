@@ -1,5 +1,7 @@
  const Like = require('../models/Like.model')
+ const Dislike = require('../models/Dislike.model')
  const Comment = require('../models/Comment.model')
+ 
 
 
  module.exports.likesList = (req, res, next) => {
@@ -13,24 +15,50 @@
 }
 
 module.exports.likes = (req, res, next) => {
-    const adoptionId = req.params.id
+    const adoptionId = req.params.id         
 
-    Like.findOneAndDelete({ adoption: adoptionId, user: req.currentUser })
-    .then(like => {
-        if (like) {
-            res.status(200).json({ success : 'Like remove from DDBB'})
-        } else {
-            return Like.create({ adoption: adoptionId, user: req.currentUser})
-            .then(() => {
-                res.status(201).json({ success : 'Like added to DDBB' })
-            })
-        }
-    })
+            Like.findOneAndDelete({ adoption: adoptionId, user: req.currentUser })
+                .then(like => {
+                    if (like) {
+                        res.status(200).json({ success : 'Like remove from DDBB'})
+                    }  else {
+                        return Like.create({ adoption: adoptionId, user: req.currentUser})
+                            .then(() => {
+                                res.status(201).json({ success : 'Like added to DDBB' })
+                        })
+                    }
+                })
     .catch((err) => {
         console.log(err)
         next(err)
     })
+
 }
+
+module.exports.dislikes = (req, res, next) => {
+   const adoptionId = req.params.id
+   
+   Dislike.findOneAndDelete({ adoption: adoptionId, user: req.currentUser })
+        .then((dislike) => {
+            if (dislike) {
+                res.status(200).json({ success : 'Dislike remove from DDBB'})
+            } else {
+                return Dislike.create({ adoption: adoptionId, user: req.currentUser})
+                    .then(() => {
+                        res.status(201).json({ success : 'Dislike added to DDBB' })
+                    })
+            }
+        })
+
+        .catch((err) => {
+            console.log(err)
+            next(err)
+        })
+      // Cuando des dislike tiene que anadirlo como en los likes
+    // Cuando hagas un like, tienes que buscar si existe un dislike y borrarlo y ya despues creas ese like
+
+}
+
 
 
 
