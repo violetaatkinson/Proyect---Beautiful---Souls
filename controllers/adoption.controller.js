@@ -1,5 +1,6 @@
 const createError = require('http-errors');
 const Adoption = require('../models/Adoption.model');
+const Dislike = require('../models/Dislike.model');
 const Like = require('../models/Like.model');
 
 
@@ -17,12 +18,14 @@ module.exports.list = (req, res, next) => {
     const promises = [
       Adoption.find(criteria),
       Like.find({ user: req.currentUser }),
+      Dislike.find({ user: req.currentUser }),
     ]
 
     Promise.all(promises)
-      .then(([ adoptions, likes ]) => {
+      .then(([ adoptions, likes, dislikes ]) => {
         const filteredAdoptions = adoptions
           .filter(adoption => !likes.some(like => like.adoption.toString() === adoption._id.toString()))
+          .filter(adoption => !dislikes.some(dislike => dislike.adoption.toString() === adoption._id.toString()))
 
           res.json(filteredAdoptions)
       })

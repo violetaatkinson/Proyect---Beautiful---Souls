@@ -19,7 +19,7 @@ const commentSchema = new Schema ({
     content: {
         type: String,
         required: true,
-        maxLength: [50, 'To long'],
+        maxLength: [500, 'To long'],
     } 
 },{timestamps: true })
 
