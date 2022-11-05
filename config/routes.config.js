@@ -2,13 +2,12 @@ const router = require('express').Router();
 
 const fileUploader = require('./cloudinary.config')
 const authMiddleware = require('../middlewares/auth.middleware');
-
 const authController = require('../controllers/auth.controller');
 const usersController = require('../controllers/users.controller');
 const adoptionController = require('../controllers/adoption.controller')
 const miscController = require('../controllers/misc.controller')
 const adoptedController = require('../controllers/adopted.controller')
-const socketController = require('../controllers/socketcontroller')
+const messageController = require('../controllers/message.controller')
 
 router.get('/', (req, res, next) => res.json({ ok: true }));
 
@@ -29,13 +28,16 @@ router.get("/profile", authMiddleware.isAuthenticated, usersController.profile)
 
 // ADOPTION
 
+
 router.get('/adoptions', authMiddleware.isAuthenticated, adoptionController.list) // veo todas las adopciones que hay diponibles
-//router.get('/adoptions', authMiddleware.isAuthenticated, adoptionController.countAdopted)
 router.post('/adoptions/create',authMiddleware.isAuthenticated , fileUploader.single('image'), adoptionController.createAdoption)
 router.get('/adoptions/:id', adoptionController.detail)
 router.post('/adoptions/:id',authMiddleware.isAuthenticated, adoptionController.edit)
 router.delete('/adoptions/:id',authMiddleware.isAuthenticated, adoptionController.delete)
 router.get('/myadoptions',authMiddleware.isAuthenticated, adoptionController.getMyAdoptions )
+
+router.get('/countadopted', adoptionController.alreadyAdopted) // cuenta los adoptados
+router.get('/count', adoptionController.countAdopted) // cuenta las adopciones
 
 // ADOPTED
 
@@ -48,23 +50,15 @@ router.get('/like', authMiddleware.isAuthenticated, miscController.likesList)
 router.post('/like/:id', authMiddleware.isAuthenticated, miscController.likes)
 router.post('/dislike/:id', authMiddleware.isAuthenticated, miscController.dislikes)
 
-router.get('/comment/:id', authMiddleware.isAuthenticated, miscController.commentList)
-router.post('/comment/:id', authMiddleware.isAuthenticated, miscController.comment)
-router.post('/comment/:id',authMiddleware.isAuthenticated, miscController.edit)
-router.delete("/comment/:id/delete", authMiddleware.isAuthenticated, miscController.delete)
 
 
-// MESSAGES (SOCKET)
 
-//  router.get('/messages', authMiddleware.isAuthenticated, socketController.selectUser)
-//  router.get('/message/:username' , authMiddleware.isAuthenticated, socketController.messages)
-//  router.post('/message/:username' , authMiddleware.isAuthenticated, socketController.createMessage )
+// MESSAGES 
 
-
-// NOTIFICATIONS (SOCKET)
-
- //router.get('/notifications', authMiddleware.isAuthenticated, socketController.notifications )
-
+router.get('/chat/:userId', authMiddleware.isAuthenticated , messageController.listMessages)
+//y enlistar los mensajes (traerme todos los mensajes (finde de sender y reciver))
+router.post('/chat/create', authMiddleware.isAuthenticated , messageController.createMessages )
+// crear mensajes(sender, reciber y mensaje) 
 
 
 
