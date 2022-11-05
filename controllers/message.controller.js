@@ -1,8 +1,8 @@
 const Message = require('../models/Message.model')
-const User = require('../models/User.model')
+
 
 module.exports.listMessages = (req, res, next) => {
-    const user = req.params.userId 
+    const user = req.params.userId // este userId viene de /chat/:userId
     
     Message.find({ $or: [
         { sender: user },{ receiver: req.currentUser }, { sender: req.currentUser },{ receiver: user }
@@ -21,7 +21,7 @@ module.exports.listMessages = (req, res, next) => {
 
         let msgToSave = {}
         
-        msgToSave.sender = currentUser.id
+        msgToSave.sender = currentUser
         msgToSave.msg = msg
         msgToSave.receiver = receiver
                 
