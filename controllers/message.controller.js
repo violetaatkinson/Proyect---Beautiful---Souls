@@ -1,11 +1,14 @@
 const Message = require('../models/Message.model')
+const { notificacionTitles } = require('../models/Notification.model')
+const { sendNotification } = require('../services/notificationService')
 
 
 module.exports.listMessages = (req, res, next) => {
     const user = req.params.userId // este userId viene de /chat/:userId
     
     Message.find({ $or: [
-        { sender: user },{ receiver: req.currentUser }, { sender: req.currentUser },{ receiver: user }
+        { sender: user, receiver: req.currentUser }, 
+        { sender: req.currentUser, receiver: user }
     ]})
         .populate('receiver')
         .populate('sender')
@@ -27,7 +30,13 @@ module.exports.listMessages = (req, res, next) => {
                 
         Message.create(msgToSave)
             .then((messageCreated) => {
-                res.status(201).json(messageCreated)
+                const { sender, receiver } = messageCreated
+                sendNotification({ user: sender, receiver:receiver,  type: 'Message', title: "New Message" })
+                    .then(result => {
+                        console.log("resultado", result)
+                        res.status(201).json(messageCreated)
+                    })
+                
             })
             .catch(next)
     }

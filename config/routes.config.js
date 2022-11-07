@@ -8,6 +8,7 @@ const adoptionController = require('../controllers/adoption.controller')
 const miscController = require('../controllers/misc.controller')
 const adoptedController = require('../controllers/adopted.controller')
 const messageController = require('../controllers/message.controller')
+const notificacionController = require('../controllers/notification.controller')
 
 router.get('/', (req, res, next) => res.json({ ok: true }));
 
@@ -18,7 +19,7 @@ router.post('/login', authController.login);
 
 // USERS
 
-router.get('/users', usersController.list) // utilizaremos el plural del modelo que vamos a buscar
+router.get('/users', authMiddleware.isAuthenticated, usersController.list) // utilizaremos el plural del modelo que vamos a buscar
 router.post('/users', fileUploader.single('image') , usersController.create) // este seria mi register
 router.get('/users/me', authMiddleware.isAuthenticated, usersController.getCurrentUser)
 router.put('/users/:id', authMiddleware.isAuthenticated, fileUploader.single('image'), usersController.edit) // edito mi perfil
@@ -27,7 +28,6 @@ router.delete('/users/:id',authMiddleware.isAuthenticated, usersController.delet
 router.get("/profile", authMiddleware.isAuthenticated, usersController.profile)
 
 // ADOPTION
-
 
 router.get('/adoptions', authMiddleware.isAuthenticated, adoptionController.list) // veo todas las adopciones que hay diponibles
 router.post('/adoptions/create',authMiddleware.isAuthenticated , fileUploader.single('image'), adoptionController.createAdoption)
@@ -45,20 +45,19 @@ router.get('/adopted', adoptedController.adoptedList)
 router.post('/adopted/create', authMiddleware.isAuthenticated, fileUploader.single('image'), adoptedController.createAdopted)
 
 // MISC
-
 router.get('/like', authMiddleware.isAuthenticated, miscController.likesList)
 router.post('/like/:id', authMiddleware.isAuthenticated, miscController.likes)
 router.post('/dislike/:id', authMiddleware.isAuthenticated, miscController.dislikes)
 
+// NOTIFICATION
 
-
+router.get('/notifications', authMiddleware.isAuthenticated, notificacionController.notificationList)
 
 // MESSAGES 
 
 router.get('/chat/:userId', authMiddleware.isAuthenticated , messageController.listMessages)
-//y enlistar los mensajes (traerme todos los mensajes (finde de sender y reciver))
 router.post('/chat/create', authMiddleware.isAuthenticated , messageController.createMessages )
-// crear mensajes(sender, reciber y mensaje) 
+
 
 
 

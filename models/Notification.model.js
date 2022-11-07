@@ -1,21 +1,34 @@
 const mongoose = require("mongoose");
 
-BELL = [ 'Like', 'Comment', 'Message']
+const notificationsTypes = ['Like', 'Message'];
 
+module.exports.notificacionTitles = {
+  newMessage: 'New message',
+  newLike: 'New Like'
+}
 
 const notificationSchema = new mongoose.Schema(
   {
     type: {
       type: String,
-      enum: BELL
+      enum: notificationsTypes
     },
-    sender: {
+    user: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      ref: "User"
     },
     receiver: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      ref: "User"
+    },
+    title: {
+      type: String,
+      required: true,
+      trim: true
+    },
+    description: {
+      type: String,
+      trim: true
     }
   },
   {

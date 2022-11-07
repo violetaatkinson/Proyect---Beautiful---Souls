@@ -3,7 +3,7 @@ const User = require('../models/User.model');
 const Like = require('../models/Like.model.js')
 
 module.exports.list = (req, res, next) => {
-    User.find() // buscamos los usuarios
+    User.find({ _id: { $ne: req.currentUser } }) // buscamos los usuarios
       .then(users => { // promesa los encontramos
         res.json(users)// los devolvemos
       })
