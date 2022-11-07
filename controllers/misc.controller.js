@@ -1,6 +1,7 @@
  const Like = require('../models/Like.model')
  const Dislike = require('../models/Dislike.model')
 const { sendNotification } = require('../services/notificationService')
+const Adoption = require('../models/Adoption.model')
 
 
 
@@ -22,11 +23,15 @@ module.exports.likes = (req, res, next) => {
             if (like) {
                 res.status(200).json({ success : 'Like remove from DDBB'})
             }  else {
-                return Like.create({ adoption: adoptionId, user: req.currentUser}).populate('adoption')
+                return Like.create({ adoption: adoptionId, user: req.currentUser })
                     .then((like) => {
-                        sendNotification({ user: like.adoption.owner, type: 'Like', title: notificacionTitles.newLike })
-                        Dislike.findOneAndDelete({ adoption: adoptionId, user: req.currentUser })
-                            .then(() => res.status(201).json({ success : 'Like added to DDBB' }))
+                        Adoption.findById(like.adoption)
+                            .then(adoption => {
+                                sendNotification({ receiver: adoption.owner, user: req.currentUser, type: 'Like', title: 'New Like' })
+                                Dislike.findOneAndDelete({ adoption: adoptionId, user: req.currentUser })
+                                    .then(() => res.status(201).json({ success : 'Like added to DDBB' }))
+                            })
+                       
                 })
             }
         })

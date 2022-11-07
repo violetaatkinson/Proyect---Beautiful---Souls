@@ -31,7 +31,7 @@ module.exports.listMessages = (req, res, next) => {
         Message.create(msgToSave)
             .then((messageCreated) => {
                 const { sender, receiver } = messageCreated
-                sendNotification({ user: sender, receiver:receiver,  type: 'Message', title: "New Message" })
+                sendNotification({ user: sender, receiver:receiver,  type: 'Message', title: "New Message", description: msg })
                     .then(result => {
                         console.log("resultado", result)
                         res.status(201).json(messageCreated)
