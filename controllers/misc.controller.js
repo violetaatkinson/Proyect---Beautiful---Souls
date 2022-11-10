@@ -27,7 +27,7 @@ module.exports.likes = (req, res, next) => {
                     .then((like) => {
                         Adoption.findById(like.adoption)
                             .then(adoption => {
-                                sendNotification({ receiver: adoption.owner, user: req.currentUser, type: 'Like', title: 'New Like' })
+                                sendNotification({ receiver: adoption.owner, user: req.currentUser, type: 'Like', title: 'liked your pet' })
                                 Dislike.findOneAndDelete({ adoption: adoptionId, user: req.currentUser })
                                     .then(() => res.status(201).json({ success : 'Like added to DDBB' }))
                             })
