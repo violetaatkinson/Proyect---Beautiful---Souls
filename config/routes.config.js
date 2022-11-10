@@ -23,7 +23,7 @@ router.get('/users', authMiddleware.isAuthenticated, usersController.list) // ut
 router.post('/users', fileUploader.single('image') , usersController.create) // este seria mi register
 router.get('/users/me', authMiddleware.isAuthenticated, usersController.getCurrentUser)
 router.put('/users/:id', authMiddleware.isAuthenticated, fileUploader.single('image'), usersController.edit) // edito mi perfil
-router.delete('/users/:id',authMiddleware.isAuthenticated, usersController.delete) // elimino mi perfil
+router.delete('/users/:id/delete',authMiddleware.isAuthenticated, usersController.delete) // elimino mi perfil
 
 router.get("/profile", authMiddleware.isAuthenticated, usersController.profile)
 
