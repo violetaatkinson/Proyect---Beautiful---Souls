@@ -109,8 +109,9 @@ module.exports.list = (req, res, next) => {
   
   
   module.exports.getMyAdoptions = (req, res, next) => {
-  Adoption.find({ 'owner._id': req.currentUser._id })
+  Adoption.find({ 'owner': req.currentUser })
     .then((adoptions) => {
+      console.log(adoptions)
       res.status(200).json(adoptions)
       // Aparte habra que buscar los like cuyo adoption sea el adoption._id
     })
