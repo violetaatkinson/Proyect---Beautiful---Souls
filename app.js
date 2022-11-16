@@ -13,8 +13,6 @@ app.use(cors())
 app.use(logger('dev'));
 app.use(express.json()); // Sin esto no sabe usar req.body
 
-const options = { cors: { origin: "*" }}
-
 const routes = require('./config/routes.config'); // conecto las rutas
 app.use('/api', routes)
 
