@@ -20,6 +20,7 @@ router.post('/login', authController.login);
 // USERS
 
 router.get('/users', authMiddleware.isAuthenticated, usersController.list) // utilizaremos el plural del modelo que vamos a buscar
+router.get('/users/liked', authMiddleware.isAuthenticated, usersController.listWithLikes) // utilizaremos el plural del modelo que vamos a buscar
 router.post('/users', fileUploader.single('image') , usersController.create) // este seria mi register
 router.get('/users/me', authMiddleware.isAuthenticated, usersController.getCurrentUser)
 router.put('/users/:id', authMiddleware.isAuthenticated, fileUploader.single('image'), usersController.edit) // edito mi perfil
@@ -36,8 +37,6 @@ router.post('/adoptions/:id',authMiddleware.isAuthenticated, adoptionController.
 router.delete('/adoptions/:id',authMiddleware.isAuthenticated, adoptionController.delete)
 router.get('/myadoptions',authMiddleware.isAuthenticated, adoptionController.getMyAdoptions )
 
-router.get('/countadopted', adoptionController.alreadyAdopted) // cuenta los adoptados
-router.get('/count', adoptionController.countAdopted) // cuenta las adopciones
 
 // ADOPTED
 
@@ -57,7 +56,7 @@ router.get('/notifications', authMiddleware.isAuthenticated, notificacionControl
 
 router.get('/chat/:userId', authMiddleware.isAuthenticated , messageController.listMessages)
 router.post('/chat/create', authMiddleware.isAuthenticated , messageController.createMessages )
-
+// router.delete('/chat', messageController.deleteOldMessages )
 
 
 

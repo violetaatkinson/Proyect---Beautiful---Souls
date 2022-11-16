@@ -1,7 +1,7 @@
 const Message = require('../models/Message.model')
 const { notificacionTitles } = require('../models/Notification.model')
 const { sendNotification } = require('../services/notificationService')
-
+const moment = require('moment');
 
 module.exports.listMessages = (req, res, next) => {
     const user = req.params.userId // este userId viene de /chat/:userId
@@ -41,7 +41,6 @@ module.exports.listMessages = (req, res, next) => {
             .catch(next)
     }
     
-
+  
 
  
-        

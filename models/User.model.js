@@ -1,11 +1,6 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 
-const ROLES_USER =["FosterHome","Adopter","Owner"]
-// FosterHome = "casa de refugio" 
-//Adopter = "el que va a adoptar"
-//Owner = "el que crea el anuncio para adoptar"
-
 const EMAIL_PATTERN = /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i
 const PASSWORD_PATTERN = /^.{8,}$/i
 const SALT_ROUNDS = 10
@@ -28,11 +23,7 @@ const userSchema = new mongoose.Schema(
             required: [true, 'Password is required.'],
             match: [PASSWORD_PATTERN, 'Password must contain at least 8 characters.']
         },
-        role: {
-            type: String,
-            enum: ROLES_USER
-        },
-        
+      
         firstName: {
             type: String,
             

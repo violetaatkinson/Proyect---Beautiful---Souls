@@ -31,25 +31,8 @@ module.exports.list = (req, res, next) => {
       })
       .catch(next)
 
-
-
-    // Adoption.find(criteria) // buscamos las adopciones
-    //   .then(adoptions => { // promesa las encontramos
-    //     res.json(adoptions)// las devolvemos
-    //   })
-    //   .catch(next)
   }
 
-  module.exports.countAdopted = (req, res, next) => {
-    Adoption.count({ adopted: false })
-      .then(number => res.json({ count: number }))
-  }
-
-
-  module.exports.alreadyAdopted = (req, res, next) => {
-    Adoption.find({ adopted: true })
-      .then(adopted => res.json({ adopted: adopted }))
-  }
 
 
   module.exports.createAdoption = (req, res, next) => {
@@ -118,4 +101,5 @@ module.exports.list = (req, res, next) => {
     .catch(next)
 
   };
-  
+
+    

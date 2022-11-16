@@ -1,6 +1,8 @@
 const createError = require('http-errors');
 const User = require('../models/User.model');
-const Like = require('../models/Like.model.js')
+const Like = require('../models/Like.model.js');
+const Adoption = require('../models/Adoption.model');
+
 
 module.exports.list = (req, res, next) => {
     User.find({ _id: { $ne: req.currentUser } }) // buscamos los usuarios
@@ -9,6 +11,33 @@ module.exports.list = (req, res, next) => {
       })
       .catch(next)
   }
+
+  /*
+ .populate({
+      path: "like",
+      populate:{
+        path: "user"
+      }
+    })// buscamos los usuarios
+  */
+
+module.exports.listWithLikes = (req, res, next) => {
+  Adoption.find({ owner: req.currentUser })
+  .populate({path: "like", populate: { path:"user"}})
+    .then(adoptions => {
+      const result = adoptions.reduce((acc, adoption) => {
+        const users = adoption.like.map(like => like.user)
+        acc = [...acc, ...users]
+        return acc
+      },[])
+      const set = new Set(result) 
+      const arrSet = Array.from(set)// promesa los encontramos
+      res.json(arrSet)// los devolvemos
+    })
+    .catch(next)
+}
+
+
 
   module.exports.create = (req, res, next) => {
     const user = {

@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const bcrypt = require('bcrypt');
+
 
 SPECIES = ['Dog','Cat','Reptile','Bird']
 SIZES = ['Small','Medium','Large']
@@ -40,9 +40,7 @@ const adoptionSchema = new mongoose.Schema({
         required: [true, 'size is required.'],
         enum: SIZES,
     },
-    hobbies:{
-        type:[String]
-    },
+   
     owner: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
