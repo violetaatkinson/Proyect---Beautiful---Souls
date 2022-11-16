@@ -17,6 +17,28 @@ module.exports.listMessages = (req, res, next) => {
             }) 
             .catch(next)
     }
+
+module.exports.listChats = (req, res, next) => {
+        console.log("entro", req.currentUser)
+        Message.find({ $or: [
+            { receiver: req.currentUser }, 
+            { sender: req.currentUser }
+        ]})
+            .populate('receiver')
+            .populate('sender')
+                .then((messages) => {
+
+                    const result = messages.reduce((acc, message) => {
+                        
+                        acc = [...acc, message.sender, message.receiver]
+                        return acc
+                    }, [])
+                    const filteredResult = result.filter(user => user.id !== req.currentUser)
+                    const monoSet = filteredResult.filter((v,i,a) => a.findIndex(v2 => (v2.id===v.id))===i)
+                    res.json(monoSet)// los devolvemos
+                }) 
+                .catch(next)
+}
     
     module.exports.createMessages = (req, res, next) => {
         const currentUser = req.currentUser 

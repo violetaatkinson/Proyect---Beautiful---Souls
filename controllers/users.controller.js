@@ -5,7 +5,7 @@ const Adoption = require('../models/Adoption.model');
 
 
 module.exports.list = (req, res, next) => {
-    User.find({ _id: { $ne: req.currentUser } }) // buscamos los usuarios
+    User.find({ _id: { $ne: req.currentUser } }) // buscamos los usuarios menos yo
       .then(users => { // promesa los encontramos
         res.json(users)// los devolvemos
       })
