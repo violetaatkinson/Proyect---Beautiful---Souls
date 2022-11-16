@@ -4,21 +4,16 @@ const mongoose = require('mongoose');
 const logger = require('morgan');
 const createError = require('http-errors');
 const jwt = require('jsonwebtoken');
-
+const cors = require('cors')
 require('./config/db.config'); // se conecta a la base de datos que esta en config
 
 const app = express();
+
+app.use(cors())
 app.use(logger('dev'));
 app.use(express.json()); // Sin esto no sabe usar req.body
 
-// CORS middleware
-app.use((req, res, next) => {
-  res.set("Access-Control-Allow-Origin", "*");
-  res.set("Access-Control-Allow-Headers", "content-type, Authorization");
-  res.set("Access-Control-Allow-Methods", "*");
-  res.set("Access-Control-Allow-Credentials", "true");
-  next();
-});
+const options = { cors: { origin: "*" }}
 
 const routes = require('./config/routes.config'); // conecto las rutas
 app.use('/api', routes)
