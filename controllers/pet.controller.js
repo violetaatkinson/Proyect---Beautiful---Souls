@@ -3,100 +3,125 @@ const Adoption = require('../models/Adoption.model');
 const Dislike = require('../models/Dislike.model');
 const Like = require('../models/Like.model');
 
+const OWNER_POPULATE_FIELDS =
+  'userName image accountType shelterName shelterVerified city phoneNumber email';
 
+const WRITABLE_FIELDS = ['name', 'years', 'specie', 'description', 'gender', 'size'];
 
-module.exports.list = (req, res, next) => {
-    const { specie } = req.query // url
+const pickWritableFields = (body) =>
+  WRITABLE_FIELDS.reduce((acc, field) => {
+    if (body[field] !== undefined) acc[field] = body[field];
+    return acc;
+  }, {});
+
+const isOwner = (adoption, currentUserId) =>
+  adoption.owner?.toString() === currentUserId?.toString();
+
+module.exports.list = async (req, res, next) => {
+  try {
+    const { specie } = req.query;
+    const page = Math.max(Number(req.query.page) || 1, 1);
+    const limit = Math.min(Number(req.query.limit) || 20, 50);
+    const currentUser = req.currentUser;
+
+    const [likes, dislikes] = await Promise.all([
+      Like.find({ user: currentUser }).select('adoption'),
+      Dislike.find({ user: currentUser }).select('adoption'),
+    ]);
+
+    const excludedIds = [...likes, ...dislikes].map((entry) => entry.adoption);
+
     const criteria = {
-      adopted: false
+      adopted: false,
+      owner: { $ne: currentUser }, // no me muestro mis propias publicaciones en el swipe
+      _id: { $nin: excludedIds },
+    };
+
+    if (specie) criteria.specie = specie;
+
+    const adoptions = await Adoption.find(criteria)
+      .skip((page - 1) * limit)
+      .limit(limit);
+
+    res.json(adoptions);
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports.createAdoption = async (req, res, next) => {
+  try {
+    const adoption = {
+      ...pickWritableFields(req.body),
+      owner: req.currentUser,
+    };
+
+    if (req.file) adoption.image = req.file.path;
+
+    const created = await Adoption.create(adoption);
+    res.status(201).json(created);
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports.detail = async (req, res, next) => {
+  try {
+    const adoption = await Adoption.findById(req.params.id).populate(
+      'owner',
+      OWNER_POPULATE_FIELDS
+    );
+
+    if (!adoption) return next(createError(404, 'adoption not found'));
+
+    res.json(adoption);
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports.edit = async (req, res, next) => {
+  try {
+    const adoption = await Adoption.findById(req.params.id);
+    if (!adoption) return next(createError(404, 'adoption not found'));
+
+    if (!isOwner(adoption, req.currentUser)) {
+      return next(createError(403, 'You are not allowed to edit this pet'));
     }
 
-    if(specie) { // url de specie
-      criteria.specie = specie 
+    const updates = pickWritableFields(req.body);
+    if (req.file) updates.image = req.file.path;
+
+    Object.assign(adoption, updates);
+    await adoption.save(); // corre las validaciones del schema (enum, minLength, etc.)
+
+    res.status(200).json(adoption);
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports.delete = async (req, res, next) => {
+  try {
+    const adoption = await Adoption.findById(req.params.id);
+    if (!adoption) return next(createError(404, 'adoption not found'));
+
+    if (!isOwner(adoption, req.currentUser)) {
+      return next(createError(403, 'You are not allowed to delete this pet'));
     }
 
-    const promises = [
-      Adoption.find(criteria),
-      Like.find({ user: req.currentUser }),
-      Dislike.find({ user: req.currentUser }),
-    ]
-
-    Promise.all(promises)
-      .then(([ adoptions, likes, dislikes ]) => {
-        const filteredAdoptions = adoptions
-          .filter(adoption => !likes.some(like => like.adoption.toString() === adoption._id.toString()))
-          .filter(adoption => !dislikes.some(dislike => dislike.adoption.toString() === adoption._id.toString()))
-
-          res.json(filteredAdoptions)
-      })
-      .catch(next)
-
+    await adoption.deleteOne();
+    res.status(200).json(adoption);
+  } catch (error) {
+    next(error);
   }
+};
 
-
-
-  module.exports.createAdoption = (req, res, next) => {
-      const adoption = {
-        ...req.body,
-        owner: req.currentUser
-      };
-
-      if (req.file) {
-        adoption.image = req.file.path;
-      }
-
-    console.log(req.body, req.file);
-     
-    Adoption.create(adoption) // creamos una adopcion con el curent user
-        .then(adoption => { // se crea la adopcion 
-            res.status(201).json(adoption) // la devolvemos
-        })  
-        .catch(next)
+module.exports.getMyAdoptions = async (req, res, next) => {
+  try {
+    const adoptions = await Adoption.find({ owner: req.currentUser });
+    res.status(200).json(adoptions);
+  } catch (error) {
+    next(error);
   }
-
- 
-
-  module.exports.detail = (req, res, next) => {
-    Adoption.findById(req.params.id) // encontramos la adopcion x el id
-        .populate('owner', 'userName email phoneNumber image')
-        .then(adoption => { // si hay adopcion
-            if(!adoption) { // si no hay adopcion
-              next(createError(404, 'adoption not found')); // devolvemos un error
-            } else { // si existe
-                res.json(adoption); // devolvemos la adopcion encontrada
-            }
-        }) .catch(next)
-  }
-
-
-  module.exports.edit = (req, res, next) => {
-    Adoption.findByIdAndUpdate(req.params.id, req.body, { new: true })
-      .then(adoption => {
-        console.log(adoption, req.body)
-        res.status(200).json(adoption)})
-        .catch(next)
-  }
-
-  
-  module.exports.delete = (req, res, next) => {
-    Adoption.findByIdAndRemove(req.params.id)
-    .then((adoption) => {
-      if (!adoption) {
-        next(createError(404, 'adoption not found'))
-      }
-      res.status(200).json(adoption)
-    })
-    .catch(next);
-  };
-  
-  
-  
-  module.exports.getMyAdoptions = (req, res, next) => {
-  Adoption.find({ 'owner': req.currentUser })
-    .then((adoptions) => {
-      console.log(adoptions)
-      res.status(200).json(adoptions)
-    })
-    .catch(next)
-
-  };
+};
