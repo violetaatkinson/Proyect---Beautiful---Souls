@@ -6,16 +6,12 @@ const Like = require('../models/Like.model');
 const OWNER_POPULATE_FIELDS =
   'userName image accountType shelterName shelterVerified city phoneNumber email';
 
-// owner y status quedan afuera de lo editable por el cliente: owner lo
-// pone el backend, y status se maneja aparte (marcar como adoptado, etc.)
 const WRITABLE_FIELDS = [
   'name', 'species', 'breed', 'ageYears', 'ageMonths', 'sex', 'size',
   'description', 'personalityTags', 'energyLevel', 'health',
   'compatibility', 'adoptionRequirements', 'location',
 ];
 
-// Cuando se sube una foto, el form llega como multipart/form-data y los
-// campos anidados (arrays/objetos) viajan como string JSON.
 const JSON_FIELDS = ['personalityTags', 'health', 'compatibility', 'adoptionRequirements', 'location'];
 
 const parseIfJSON = (field, value) => {
@@ -74,10 +70,9 @@ module.exports.createPet = async (req, res, next) => {
       owner: req.currentUser,
     };
 
-    // Hoy el middleware solo acepta un archivo (fileUploader.single('image')).
-    // Cuando armemos el wizard con varias fotos, esto pasa a
-    // fileUploader.array('images', 8) y acá mapeamos req.files completo.
-    if (req.file) pet.images = [req.file.path];
+    if (req.files?.length) {
+      pet.images = req.files.map((file) => file.path);
+    }
 
     const created = await Pet.create(pet);
     res.status(201).json(created);
@@ -106,7 +101,11 @@ module.exports.edit = async (req, res, next) => {
     }
 
     const updates = pickWritableFields(req.body);
-    if (req.file) updates.images = [req.file.path, ...pet.images.slice(1)];
+
+    // Si llegan fotos nuevas, reemplazan a todas las anteriores (no las mezcla).
+    if (req.files?.length) {
+      updates.images = req.files.map((file) => file.path);
+    }
 
     Object.assign(pet, updates);
     await pet.save();
