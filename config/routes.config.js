@@ -19,21 +19,21 @@ router.post('/login', authController.login);
 
 // USERS
 
-router.get('/users', authMiddleware.isAuthenticated, usersController.list) // utilizaremos el plural del modelo que vamos a buscar
-router.get('/users/liked', authMiddleware.isAuthenticated, usersController.listWithLikes) // utilizaremos el plural del modelo que vamos a buscar
-router.post('/users', fileUploader.single('image') , usersController.create) // este seria mi register
+router.get('/users', authMiddleware.isAuthenticated, usersController.list)
+router.get('/users/liked', authMiddleware.isAuthenticated, usersController.listWithLikes)
+router.post('/users', fileUploader.single('image') , usersController.create)
 router.get('/users/me', authMiddleware.isAuthenticated, usersController.getCurrentUser)
-router.put('/users/:id', authMiddleware.isAuthenticated, fileUploader.single('image'), usersController.edit) // edito mi perfil
-router.delete('/users/:id/delete',authMiddleware.isAuthenticated, usersController.delete) // elimino mi perfil
+router.put('/users/:id', authMiddleware.isAuthenticated, fileUploader.single('image'), usersController.edit)
+router.delete('/users/:id/delete',authMiddleware.isAuthenticated, usersController.delete)
 
 router.get("/profile", authMiddleware.isAuthenticated, usersController.profile)
 
 // ADOPTION
 
-router.get('/adoptions', authMiddleware.isAuthenticated, adoptionController.list) // veo todas las adopciones que hay diponibles
+router.get('/adoptions', authMiddleware.isAuthenticated, adoptionController.list)
 router.post('/adoptions/create',authMiddleware.isAuthenticated , fileUploader.single('image'), adoptionController.createAdoption)
 router.get('/adoptions/:id', adoptionController.detail)
-router.post('/adoptions/:id',authMiddleware.isAuthenticated, adoptionController.edit)
+router.post('/adoptions/:id', authMiddleware.isAuthenticated, fileUploader.single('image'), adoptionController.edit)
 router.delete('/adoptions/:id',authMiddleware.isAuthenticated, adoptionController.delete)
 router.get('/myadoptions',authMiddleware.isAuthenticated, adoptionController.getMyAdoptions )
 
@@ -63,4 +63,3 @@ router.post('/chat/create', authMiddleware.isAuthenticated , messageController.c
 
 
 module.exports = router;
-
