@@ -27,7 +27,7 @@ module.exports.listChats = (req, res, next) => {
             .populate('receiver')
             .populate('sender')
                 .then((messages) => {
-
+                        console.log("entro en mesajes",messages);
                     const result = messages.reduce((acc, message) => {
                         
                         acc = [...acc, message.sender, message.receiver]
@@ -35,6 +35,7 @@ module.exports.listChats = (req, res, next) => {
                     }, [])
                     const filteredResult = result.filter(user => user.id !== req.currentUser)
                     const monoSet = filteredResult.filter((v,i,a) => a.findIndex(v2 => (v2.id===v.id))===i)
+                    console.log("entro en monoset", monoSet)
                     res.json(monoSet)// los devolvemos
                 }) 
                 .catch(next)

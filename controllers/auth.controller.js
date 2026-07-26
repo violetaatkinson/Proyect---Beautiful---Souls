@@ -10,7 +10,7 @@ module.exports.login = (req, res, next) => {
   if (!email || !password) { // Campos requeridos
     next(LoginError);
   } else {
-    User.findOne({ email }) // Intento buscar por email
+    User.findOne({ email: email.toLowerCase().trim() }) // Intento buscar por email (sin importar mayúsculas)
       .then(user => {
         if (!user) {
           next(LoginError); // No hay usuario
@@ -37,4 +37,3 @@ module.exports.login = (req, res, next) => {
       })
   }
 }
-
