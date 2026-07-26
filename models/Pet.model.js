@@ -20,7 +20,7 @@ const PERSONALITY_TAGS = [
 const pointSchema = new mongoose.Schema(
 	{
 		type: { type: String, enum: ["Point"], default: "Point" },
-		coordinates: { type: [Number], default: undefined }, // [lng, lat]
+		coordinates: { type: [Number], default: undefined },
 	},
 	{ _id: false },
 );
@@ -38,17 +38,16 @@ const petSchema = new mongoose.Schema(
 		ageMonths: { type: Number, min: 0, max: 11 },
 		sex: { type: String, required: true, enum: SEX },
 		size: { type: String, required: true, enum: SIZES },
-		weight: { type: Number, min: 0 }, // en kg
+		weight: { type: Number, min: 0 },
 		color: { type: String, trim: true },
-
 		images: {
 			type: [String],
-			default: ["https://res.cloudinary.com/.../default-pet.jpg"],
-			validate: [(arr) => arr.length <= 8, "máximo 8 fotos"],
+			default: [],
+			validate: [(arr) => arr.length <= 8, "max 8 photos"],
 		},
 
-		description: { type: String, required: true, minLength: 10 }, // resumen corto (tarjeta/preview)
-		backstory: { type: String, trim: true }, // historia larga (ficha completa)
+		description: { type: String, required: true, minLength: 10 },
+		backstory: { type: String, trim: true },
 		personalityTags: { type: [String], enum: PERSONALITY_TAGS, default: [] },
 		energyLevel: { type: String, enum: ENERGY_LEVELS },
 
@@ -70,7 +69,7 @@ const petSchema = new mongoose.Schema(
 		},
 
 		adoptionRequirements: { type: [String], default: [] },
-		adoptionFee: { type: Number, min: 0, default: 0 }, // 0 = sin cargo
+		adoptionFee: { type: Number, min: 0, default: 0 },
 		rescueDate: { type: Date },
 
 		location: {
