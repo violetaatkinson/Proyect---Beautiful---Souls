@@ -1,133 +1,97 @@
-const mongoose = require('mongoose');
-const bcrypt = require('bcrypt');
-const { DEFAULT_AVATAR_URL } = require('../constants/defaults');
+// backend/controllers/users.controller.js
+const createError = require('http-errors');
+const User = require('../models/User.model');
+const Like = require('../models/Like.model.js');
+const Adoption = require('../models/Adoption.model');
 
-const EMAIL_PATTERN =
-  /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
-const PASSWORD_PATTERN = /^.{8,}$/i;
-const SALT_ROUNDS = 10;
+// shelterVerified queda afuera a propósito: solo un futuro panel de
+// administración debería poder cambiarlo.
+const REGISTER_WRITABLE_FIELDS = [
+  'userName', 'email', 'password', 'firstName', 'lastName',
+  'age', 'gender', 'phoneNumber', 'accountType', 'shelterName',
+  'city', 'province',
+];
 
-const ACCOUNT_TYPES = ['individual', 'shelter'];
+const PROFILE_WRITABLE_FIELDS = [
+  'userName', 'firstName', 'lastName', 'age', 'gender',
+  'phoneNumber', 'accountType', 'shelterName', 'city', 'province',
+];
 
-const userSchema = new mongoose.Schema(
-  {
-    userName: {
-      type: String,
-      required: [true, 'userName is required.'],
-      minLength: [3, 'userName must contain at least 3 characters.'],
-      unique: [true, 'userName must be unique'],
-      trim: true,
-    },
-    email: {
-      type: String,
-      required: [true, 'Email is required.'],
-      match: [EMAIL_PATTERN, 'Email must be valid.'],
-      unique: true,
-      lowercase: true,
-      trim: true,
-    },
-    password: {
-      type: String,
-      required: [true, 'Password is required.'],
-      match: [PASSWORD_PATTERN, 'Password must contain at least 8 characters.'],
-    },
+const pickFields = (body, allowedFields) =>
+  allowedFields.reduce((acc, field) => {
+    if (body[field] !== undefined) acc[field] = body[field];
+    return acc;
+  }, {});
 
-    firstName: {
-      type: String,
-      trim: true,
-    },
-    lastName: {
-      type: String,
-      trim: true,
-    },
-    age: {
-      type: Number,
-      min: [0, 'age cannot be negative'],
-    },
-    gender: {
-      type: String,
-    },
-    phoneNumber: {
-      type: String,
-      trim: true,
-    },
-    image: {
-      type: String,
-      default: DEFAULT_AVATAR_URL,
-    },
-
-    // --- Beautiful Souls V2: cuentas de refugio/organización ---
-    accountType: {
-      type: String,
-      enum: {
-        values: ACCOUNT_TYPES,
-        message: 'accountType must be either "individual" or "shelter"',
-      },
-      default: 'individual',
-    },
-    shelterName: {
-      type: String,
-      trim: true,
-      required: [
-        function () {
-          return this.accountType === 'shelter';
-        },
-        'shelterName is required for shelter accounts.',
-      ],
-    },
-    // Solo debe poder modificarse desde un panel de administración,
-    // nunca desde el endpoint de edición de perfil del propio usuario.
-    shelterVerified: {
-      type: Boolean,
-      default: false,
-    },
-
-    // --- Ubicación básica, usada en la ficha de contacto (match) ---
-    city: {
-      type: String,
-      trim: true,
-    },
-    province: {
-      type: String,
-      trim: true,
-    },
-  },
-  {
-    timestamps: true,
-    toJSON: {
-      virtuals: true,
-      transform: (doc, ret) => {
-        delete ret.__v;
-        delete ret._id;
-        delete ret.password;
-
-        return ret;
-      },
-    },
-  }
-);
-
-userSchema.pre('save', function (next) {
-  const user = this;
-
-  if (!user.isModified('password')) {
-    return next();
-  }
-
-  bcrypt
-    .hash(user.password, SALT_ROUNDS)
-    .then((hash) => {
-      user.password = hash;
-      next();
-    })
-    .catch((err) => next(err));
-});
-
-userSchema.methods.checkPassword = function (password) {
-  return bcrypt.compare(password, this.password);
+module.exports.list = (req, res, next) => {
+  User.find({ _id: { $ne: req.currentUser } })
+    .then((users) => res.json(users))
+    .catch(next);
 };
 
-const User = mongoose.model('User', userSchema);
+module.exports.listWithLikes = (req, res, next) => {
+  Adoption.find({ owner: req.currentUser })
+    .populate({ path: 'like', populate: { path: 'user' } })
+    .then((adoptions) => {
+      const result = adoptions.reduce((acc, adoption) => {
+        const users = adoption.like.map((like) => like.user);
+        return [...acc, ...users];
+      }, []);
 
-module.exports = User;
-module.exports.ACCOUNT_TYPES = ACCOUNT_TYPES;
+      const uniqueUsers = Array.from(new Set(result));
+      res.json(uniqueUsers);
+    })
+    .catch(next);
+};
+
+module.exports.create = (req, res, next) => {
+  const user = pickFields(req.body, REGISTER_WRITABLE_FIELDS);
+
+  if (req.file) {
+    user.image = req.file.path;
+  }
+
+  User.create(user)
+    .then((createdUser) => res.status(201).json(createdUser))
+    .catch(next);
+};
+
+module.exports.getCurrentUser = (req, res, next) => {
+  User.findById(req.currentUser)
+    .then((user) => {
+      if (!user) return next(createError(404, 'User not found'));
+      res.json(user);
+    })
+    .catch(next);
+};
+
+module.exports.edit = (req, res, next) => {
+  // Un usuario solo puede editar su propia cuenta, sin importar
+  // qué :id venga en la URL.
+  const updates = pickFields(req.body, PROFILE_WRITABLE_FIELDS);
+
+  if (req.file) {
+    updates.image = req.file.path;
+  }
+
+  User.findByIdAndUpdate(req.currentUser, updates, {
+    new: true,
+    runValidators: true,
+  })
+    .then((user) => res.status(200).json(user))
+    .catch(next);
+};
+
+module.exports.delete = (req, res, next) => {
+  // Idem: solo podés borrar tu propia cuenta.
+  User.findByIdAndDelete(req.currentUser)
+    .then((user) => res.status(200).json(user))
+    .catch(next);
+};
+
+module.exports.profile = (req, res, next) => {
+  Like.find({ user: req.currentUser })
+    .populate('adoption')
+    .then((likedAdoption) => res.status(200).json(likedAdoption))
+    .catch(next);
+};
