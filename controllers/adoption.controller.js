@@ -58,6 +58,7 @@ module.exports.list = (req, res, next) => {
 
   module.exports.detail = (req, res, next) => {
     Adoption.findById(req.params.id) // encontramos la adopcion x el id
+        .populate('owner', 'userName email phoneNumber image')
         .then(adoption => { // si hay adopcion
             if(!adoption) { // si no hay adopcion
               next(createError(404, 'adoption not found')); // devolvemos un error
@@ -84,7 +85,6 @@ module.exports.list = (req, res, next) => {
         next(createError(404, 'adoption not found'))
       }
       res.status(200).json(adoption)
-      // Aparte habra que buscar los like cuyo adoption sea el adoption._id
     })
     .catch(next);
   };
@@ -96,10 +96,7 @@ module.exports.list = (req, res, next) => {
     .then((adoptions) => {
       console.log(adoptions)
       res.status(200).json(adoptions)
-      // Aparte habra que buscar los like cuyo adoption sea el adoption._id
     })
     .catch(next)
 
   };
-
-    

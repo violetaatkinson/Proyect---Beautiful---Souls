@@ -1,4 +1,4 @@
- const Like = require('../models/Like.model')
+const Like = require('../models/Like.model')
  const Dislike = require('../models/Dislike.model')
 const { sendNotification } = require('../services/notificationService')
 const Adoption = require('../models/Adoption.model')
@@ -7,9 +7,11 @@ const Adoption = require('../models/Adoption.model')
 
  module.exports.likesList = (req, res, next) => {
      Like.find({ user: req.currentUser })
-        .populate('adoption')
+        .populate({
+            path: 'adoption',
+            populate: { path: 'owner', select: 'userName email phoneNumber image' }
+        })
      .then(likes => {
-        console.log(likes)
         res.json(likes.map(like => like.adoption))
     })
     .catch(next)
@@ -49,9 +51,3 @@ module.exports.dislikes = (req, res, next) => {
     .then(() => res.status(201).json({ success : 'Dislike successfully created'}))
     .catch((e) => next(e))
 }
-
-
-
-
-
-
