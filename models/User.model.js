@@ -32,10 +32,6 @@ const userSchema = new mongoose.Schema(
       match: [PASSWORD_PATTERN, 'Password must contain at least 8 characters.'],
     },
 
-    firstName: { type: String, trim: true },
-    lastName: { type: String, trim: true },
-    age: { type: Number, min: [0, 'age cannot be negative'] },
-    gender: { type: String },
     phoneNumber: { type: String, trim: true },
     image: { type: String, default: DEFAULT_AVATAR_URL },
 
