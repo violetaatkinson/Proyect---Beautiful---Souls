@@ -26,9 +26,9 @@ router.get("/profile", authMiddleware.isAuthenticated, usersController.profile)
 
 // PETS (rutas siguen en /adoptions por ahora, para no romper el frontend actual)
 router.get('/adoptions', authMiddleware.isAuthenticated, petController.list)
-router.post('/adoptions/create', authMiddleware.isAuthenticated, fileUploader.array('images', 8), petController.createPet)
+router.post('/adoptions/create', authMiddleware.isAuthenticated, fileUploader.array('images', 4), petController.createPet)
 router.get('/adoptions/:id', petController.detail)
-router.post('/adoptions/:id', authMiddleware.isAuthenticated, fileUploader.array('images', 8), petController.edit)
+router.post('/adoptions/:id', authMiddleware.isAuthenticated, fileUploader.array('images', 4), petController.edit)
 router.delete('/adoptions/:id', authMiddleware.isAuthenticated, petController.delete)
 router.get('/myadoptions', authMiddleware.isAuthenticated, petController.getMyPets)
 

@@ -43,7 +43,7 @@ const petSchema = new mongoose.Schema(
 		images: {
 			type: [String],
 			default: [],
-			validate: [(arr) => arr.length <= 8, "max 8 photos"],
+			validate: [(arr) => arr.length <= 4, "max 4 photos"],
 		},
 
 		description: { type: String, required: true, minLength: 10 },
