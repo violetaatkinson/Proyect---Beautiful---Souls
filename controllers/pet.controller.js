@@ -1,70 +1,143 @@
-const mongoose = require('mongoose');
-const { DEFAULT_AVATAR_URL } = require('../constants/defaults');
+const createError = require('http-errors');
+const Pet = require('../models/Pet.model');
+const Dislike = require('../models/Dislike.model');
+const Like = require('../models/Like.model');
 
-const SPECIES = ['Dog', 'Cat', 'Reptile', 'Bird'];
-const SIZES = ['Small', 'Medium', 'Large'];
-const GENDER = ['Female', 'Male'];
+const OWNER_POPULATE_FIELDS =
+  'userName image accountType shelterName shelterVerified city phoneNumber email';
 
-const adoptionSchema = new mongoose.Schema(
-  {
-    name: {
-      type: String,
-      required: [true, 'name is required.'],
-      minLength: [3, 'name must contain at least 3 characters.'],
-    },
-    years: {
-      type: Number,
-    },
-    specie: {
-      type: String,
-      required: [true, 'specie is required.'],
-      enum: SPECIES,
-    },
-    description: {
-      type: String,
-      required: [true, 'description is required.'],
-      minLength: [3, 'description must contain at least 3 characters.'],
-    },
-    gender: {
-      type: String,
-      required: [true, 'gender is required.'],
-      enum: GENDER,
-    },
-    image: {
-      type: String,
-      default: DEFAULT_AVATAR_URL,
-    },
-    size: {
-      type: String,
-      required: [true, 'size is required.'],
-      enum: SIZES,
-    },
-    owner: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
-    },
-    adopted: {
-      type: Boolean,
-      default: false,
-    },
-  },
-  {
-    timestamps: true,
-    toObject: { virtuals: true },
-    toJSON: { virtuals: true },
+// owner y status quedan afuera de lo editable por el cliente: owner lo
+// pone el backend, y status se maneja aparte (marcar como adoptado, etc.)
+const WRITABLE_FIELDS = [
+  'name', 'species', 'breed', 'ageYears', 'ageMonths', 'sex', 'size',
+  'description', 'personalityTags', 'energyLevel', 'health',
+  'compatibility', 'adoptionRequirements', 'location',
+];
+
+// Cuando se sube una foto, el form llega como multipart/form-data y los
+// campos anidados (arrays/objetos) viajan como string JSON.
+const JSON_FIELDS = ['personalityTags', 'health', 'compatibility', 'adoptionRequirements', 'location'];
+
+const parseIfJSON = (field, value) => {
+  if (!JSON_FIELDS.includes(field) || typeof value !== 'string') return value;
+  try {
+    return JSON.parse(value);
+  } catch {
+    return value;
   }
-);
+};
 
-adoptionSchema.virtual('like', {
-  ref: 'Like',
-  localField: '_id',
-  foreignField: 'adoption',
-  justOne: false,
-});
+const pickWritableFields = (body) =>
+  WRITABLE_FIELDS.reduce((acc, field) => {
+    if (body[field] !== undefined) acc[field] = parseIfJSON(field, body[field]);
+    return acc;
+  }, {});
 
-const Adoption = mongoose.model('Adoption', adoptionSchema);
+const isOwner = (pet, currentUserId) => pet.owner?.toString() === currentUserId?.toString();
 
-module.exports = Adoption;
-module.exports.SPECIES = SPECIES;
-module.exports.SIZES = SIZES;
-module.exports.GENDER = GENDER;
+module.exports.list = async (req, res, next) => {
+  try {
+    const { species } = req.query;
+    const page = Math.max(Number(req.query.page) || 1, 1);
+    const limit = Math.min(Number(req.query.limit) || 20, 50);
+    const currentUser = req.currentUser;
+
+    const [likes, dislikes] = await Promise.all([
+      Like.find({ user: currentUser }).select('adoption'),
+      Dislike.find({ user: currentUser }).select('adoption'),
+    ]);
+
+    const excludedIds = [...likes, ...dislikes].map((entry) => entry.adoption);
+
+    const criteria = {
+      status: 'available',
+      owner: { $ne: currentUser },
+      _id: { $nin: excludedIds },
+    };
+
+    if (species) criteria.species = species;
+
+    const pets = await Pet.find(criteria)
+      .skip((page - 1) * limit)
+      .limit(limit);
+
+    res.json(pets);
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports.createPet = async (req, res, next) => {
+  try {
+    const pet = {
+      ...pickWritableFields(req.body),
+      owner: req.currentUser,
+    };
+
+    // Hoy el middleware solo acepta un archivo (fileUploader.single('image')).
+    // Cuando armemos el wizard con varias fotos, esto pasa a
+    // fileUploader.array('images', 8) y acá mapeamos req.files completo.
+    if (req.file) pet.images = [req.file.path];
+
+    const created = await Pet.create(pet);
+    res.status(201).json(created);
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports.detail = async (req, res, next) => {
+  try {
+    const pet = await Pet.findById(req.params.id).populate('owner', OWNER_POPULATE_FIELDS);
+    if (!pet) return next(createError(404, 'pet not found'));
+    res.json(pet);
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports.edit = async (req, res, next) => {
+  try {
+    const pet = await Pet.findById(req.params.id);
+    if (!pet) return next(createError(404, 'pet not found'));
+
+    if (!isOwner(pet, req.currentUser)) {
+      return next(createError(403, 'You are not allowed to edit this pet'));
+    }
+
+    const updates = pickWritableFields(req.body);
+    if (req.file) updates.images = [req.file.path, ...pet.images.slice(1)];
+
+    Object.assign(pet, updates);
+    await pet.save();
+
+    res.status(200).json(pet);
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports.delete = async (req, res, next) => {
+  try {
+    const pet = await Pet.findById(req.params.id);
+    if (!pet) return next(createError(404, 'pet not found'));
+
+    if (!isOwner(pet, req.currentUser)) {
+      return next(createError(403, 'You are not allowed to delete this pet'));
+    }
+
+    await pet.deleteOne();
+    res.status(200).json(pet);
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports.getMyPets = async (req, res, next) => {
+  try {
+    const pets = await Pet.find({ owner: req.currentUser });
+    res.status(200).json(pets);
+  } catch (error) {
+    next(error);
+  }
+};
