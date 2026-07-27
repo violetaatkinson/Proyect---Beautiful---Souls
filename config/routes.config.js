@@ -43,6 +43,7 @@ router.post('/dislike/:id', authMiddleware.isAuthenticated, miscController.disli
 
 // NOTIFICATION
 router.get('/notifications', authMiddleware.isAuthenticated, notificacionController.notificationList)
+router.delete('/notifications', authMiddleware.isAuthenticated, notificacionController.clearAll)
 
 // MESSAGES
 router.get('/chat/list', authMiddleware.isAuthenticated , messageController.listChats )

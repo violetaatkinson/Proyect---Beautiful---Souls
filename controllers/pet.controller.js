@@ -3,6 +3,7 @@ const Pet = require("../models/Pet.model");
 const Dislike = require("../models/Dislike.model");
 const Like = require("../models/Like.model");
 const { haversineDistanceKm } = require("../utils/geo");
+const { sendNotification } = require("../services/notificationService");
 
 const OWNER_POPULATE_FIELDS =
 	"userName image accountType shelterName shelterVerified city phoneNumber email";
@@ -138,6 +139,17 @@ module.exports.createPet = async (req, res, next) => {
 		}
 
 		const created = await Pet.create(pet);
+
+		// Notificación para el propio dueño confirmando que la publicación
+		// salió bien (no depende de que otro usuario haga algo).
+		sendNotification({
+			user: req.currentUser,
+			receiver: req.currentUser,
+			type: "Post",
+			title: "Your pet is live",
+			description: `${created.name} is now visible to adopters`,
+		}).catch((error) => console.error("sendNotification failed", error));
+
 		res.status(201).json(created);
 	} catch (error) {
 		next(error);

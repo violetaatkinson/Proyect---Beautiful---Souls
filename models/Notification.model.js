@@ -1,10 +1,11 @@
 const mongoose = require("mongoose");
 
-const notificationsTypes = ['Like', 'Message'];
+const notificationsTypes = ['Like', 'Message', 'Post'];
 
 module.exports.notificacionTitles = {
   newMessage: 'New message',
-  newLike: 'New Like'
+  newLike: 'New Like',
+  newPost: 'Your pet is live'
 }
 
 const notificationSchema = new mongoose.Schema(
