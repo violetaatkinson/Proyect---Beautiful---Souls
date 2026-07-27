@@ -49,16 +49,30 @@ module.exports.list = (req, res, next) => {
 		.catch(next);
 };
 
+// Gente que likeó alguna de mis mascotas. Antes devolvía una lista plana
+// de usuarios (y el dedupe con Set no funcionaba porque son documentos de
+// Mongoose, no primitivos). Ahora devuelve un par (user, pet) por cada
+// like, así cada fila deja clarísimo de qué mascota se trata y no hay
+// ambigüedad al abrir la conversación.
 module.exports.listWithLikes = (req, res, next) => {
 	Pet.find({ owner: req.currentUser })
 		.populate({ path: "like", populate: { path: "user" } })
 		.then((pets) => {
 			const result = pets.reduce((acc, pet) => {
-				const users = pet.like.map((like) => like.user);
-				return [...acc, ...users];
+				const rows = pet.like
+					.filter((like) => like.user)
+					.map((like) => ({ user: like.user, pet }));
+				return [...acc, ...rows];
 			}, []);
 
-			res.json(Array.from(new Set(result)));
+			const deduped = result.filter(
+				(row, i, arr) =>
+					arr.findIndex(
+						(r) => r.user.id === row.user.id && r.pet.id === row.pet.id,
+					) === i,
+			);
+
+			res.json(deduped);
 		})
 		.catch(next);
 };

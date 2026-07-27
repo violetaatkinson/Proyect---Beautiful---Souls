@@ -1,13 +1,22 @@
 require("dotenv").config();
 const express = require("express");
+const http = require("http");
 const mongoose = require("mongoose");
 const logger = require("morgan");
 const createError = require("http-errors");
 const jwt = require("jsonwebtoken");
 const cors = require("cors");
 require("./config/db.config"); // se conecta a la base de datos que esta en config
+const { initSocket } = require("./config/socket.config");
 
 const app = express();
+const server = http.createServer(app);
+const io = initSocket(server);
+
+// Los controllers acceden al socket con req.app.get('io') para poder
+// emitir eventos (ej: message.controller emite message:new al crear un
+// mensaje) sin tener que importar el módulo de sockets en cada uno.
+app.set("io", io);
 
 app.use(cors());
 app.use(logger("dev"));
@@ -66,6 +75,6 @@ app.use((error, req, res, next) => {
 });
 
 //PORT
-app.listen(process.env.PORT || 3001, () => {
+server.listen(process.env.PORT || 3001, () => {
 	console.log("App in process at", process.env.PORT || 3001);
 });

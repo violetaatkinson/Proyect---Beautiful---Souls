@@ -46,7 +46,7 @@ router.get('/notifications', authMiddleware.isAuthenticated, notificacionControl
 
 // MESSAGES
 router.get('/chat/list', authMiddleware.isAuthenticated , messageController.listChats )
-router.get('/chat/:userId', authMiddleware.isAuthenticated , messageController.listMessages)
+router.get('/chat/:userId/:petId', authMiddleware.isAuthenticated , messageController.listMessages)
 router.post('/chat/create', authMiddleware.isAuthenticated , messageController.createMessages )
 
 module.exports = router;

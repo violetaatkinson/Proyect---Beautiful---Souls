@@ -1,6 +1,7 @@
 const createError = require('http-errors');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User.model');
+const { JWT_SECRET } = require('../constants/defaults');
 
 module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
@@ -24,7 +25,7 @@ module.exports.login = (req, res, next) => {
                   {
                     id: user.id,
                   },
-                  'Super secret',
+                  JWT_SECRET,
                   {
                     expiresIn: '24h'
                   }
