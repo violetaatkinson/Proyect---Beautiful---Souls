@@ -29,6 +29,20 @@ const pickFields = (body, allowedFields) =>
 		return acc;
 	}, {});
 
+// El registro solo pide email + password. Como userName es obligatorio en el
+// modelo, si no vino en el body le generamos uno provisorio a partir del
+// email (ej: "pepita" de pepita@gmail.com + 4 dígitos para que sea único).
+// El usuario lo puede cambiar después desde "Complete Your Profile".
+const generateUsername = (email) => {
+	const base =
+		(email || "user")
+			.split("@")[0]
+			.replace(/[^a-zA-Z0-9]/g, "")
+			.slice(0, 20) || "user";
+	const suffix = Math.floor(1000 + Math.random() * 9000);
+	return `${base}${suffix}`;
+};
+
 module.exports.list = (req, res, next) => {
 	User.find({ _id: { $ne: req.currentUser } })
 		.then((users) => res.json(users))
@@ -53,6 +67,7 @@ module.exports.create = (req, res, next) => {
 	const user = pickFields(req.body, REGISTER_WRITABLE_FIELDS);
 
 	if (req.file) user.image = req.file.path;
+	if (!user.userName) user.userName = generateUsername(user.email);
 
 	User.create(user)
 		.then((createdUser) => res.status(201).json(createdUser))
