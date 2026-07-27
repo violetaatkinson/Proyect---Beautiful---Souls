@@ -106,6 +106,7 @@ module.exports.list = async (req, res, next) => {
 		if (species) criteria.species = species;
 
 		const pets = await Pet.find(criteria)
+			.populate("owner", OWNER_POPULATE_FIELDS)
 			.skip((page - 1) * limit)
 			.limit(limit);
 
