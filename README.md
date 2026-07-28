@@ -1,58 +1,169 @@
-# 🐾 Beautiful Souls — Backend
+<h1 align="center">🐾 Beautiful Souls — API</h1>
 
-REST API + real-time (Socket.IO) server for **Beautiful Souls**, an app that connects animal shelters and owners with adopters through swipe-based discovery and direct chat.
+<p align="center">
+  <strong>REST API + real-time server for Beautiful Souls.</strong>
+</p>
 
-Frontend repo: [beautiful-sols-react](https://github.com/violetaatkinson/beautiful-sols-react)
-Live API base: `https://<your-deployment>.vercel.app/api`
+<p align="center">
+  A <strong>Node.js / Express</strong> backend with <strong>MongoDB</strong> and <strong>Socket.IO</strong>, powering a mobile app that connects animal shelters and owners with adopters through swipe-based discovery and direct chat.
+</p>
 
-## 🛠 Tech stack
+---
 
-- [Node.js](https://nodejs.org/) + [Express 4](https://expressjs.com/)
-- [MongoDB](https://www.mongodb.com/) + [Mongoose 6](https://mongoosejs.com/)
-- [Socket.IO](https://socket.io/) for real-time chat
-- [JWT](https://github.com/auth0/node-jsonwebtoken) for authentication
-- [bcrypt](https://www.npmjs.com/package/bcrypt) for password hashing
-- [Cloudinary](https://cloudinary.com/) + [multer](https://www.npmjs.com/package/multer) for image uploads
-- [morgan](https://www.npmjs.com/package/morgan) for request logging
+# 📂 Source Code
 
-## 📁 Project structure
+Backend repository:
 
-```
-├── app.js                  Express app + HTTP server + Socket.IO wiring
+https://github.com/violetaatkinson/Proyect---Beautiful---Souls
+
+Frontend repository:
+
+https://github.com/violetaatkinson/beautiful-sols-react
+
+Live API base:
+
+`https://<your-deployment>.vercel.app/api`
+
+---
+
+# ✨ Main Features
+
+## 🔐 Authentication
+
+* JWT-based login, password hashing with bcrypt.
+* Route protection middleware (`isAuthenticated`) that attaches `req.currentUser`.
+* The same JWT secret authenticates both REST requests and the Socket.IO handshake.
+
+## 🐕 Pets
+
+* Full CRUD for pet listings, scoped to their owner.
+* Up to 4 photos per pet, stored on Cloudinary via multer.
+* Swipe deck query excludes your own pets and anything you've already liked/disliked.
+* Optional distance sorting via a 2dsphere geo index + Haversine distance calculation.
+
+## ❤️ Likes & Dislikes
+
+* Swipe history stored as join documents between `User` and `Pet`.
+* Powers both the swipe deck exclusion logic and the "pets you liked" list.
+
+## 💬 Real-time chat
+
+* Messages scoped to a **(user, pet)** pair, not just a pair of users — the same two people can have separate threads about different pets.
+* Socket.IO pushes new messages instantly to both participants, plus a live typing indicator.
+
+## 🔔 Notifications
+
+* Triggered on likes, new messages, and successful pet publication.
+* Clear-all endpoint.
+
+## 🎞️ Adoption stories
+
+* Public wall of community-submitted pet stories.
+
+---
+
+# 🛠️ Technologies Used
+
+### Core
+
+* Node.js
+* Express 4
+* MongoDB + Mongoose 6
+
+### Real-time
+
+* Socket.IO
+
+### Auth & Security
+
+* jsonwebtoken
+* bcrypt
+
+### Media
+
+* Cloudinary
+* multer + multer-storage-cloudinary
+
+### Other
+
+* morgan (request logging)
+* http-errors
+* moment
+
+---
+
+# 📂 Project Structure
+
+```text
+proyect-beautiful-souls-back/
+│
+├── app.js                   Express app + HTTP server + Socket.IO wiring
+│
 ├── config/
-│   ├── routes.config.js    All API routes
-│   ├── db.config.js        MongoDB connection
+│   ├── routes.config.js     All API routes
+│   ├── db.config.js         MongoDB connection
 │   ├── cloudinary.config.js Image upload storage (multer + Cloudinary)
-│   └── socket.config.js    Socket.IO server: JWT auth handshake, per-user rooms, typing events
-├── controllers/            Route handlers, one file per resource
+│   └── socket.config.js     Socket.IO: JWT handshake auth, per-user rooms, typing events
+│
+├── controllers/              Route handlers, one file per resource
+│   ├── auth.controller.js
+│   ├── users.controller.js
+│   ├── pet.controller.js
+│   ├── message.controller.js
+│   ├── notification.controller.js
+│   ├── adopted.controller.js
+│   └── misc.controller.js    Like / Dislike
+│
 ├── middlewares/
-│   └── auth.middleware.js  JWT verification, sets req.currentUser
-├── models/                 Mongoose schemas (User, Pet, Like, Dislike, Message, Notification, Adopted)
+│   └── auth.middleware.js    JWT verification
+│
+├── models/                   Mongoose schemas
+│   ├── User.model.js
+│   ├── Pet.model.js
+│   ├── Like.model.js
+│   ├── Dislike.model.js
+│   ├── Message.model.js
+│   ├── Notification.model.js
+│   └── Adopted.model.js
+│
 ├── services/
-│   └── notificationService.js  Creates Notification documents
+│   └── notificationService.js
+│
 ├── utils/
-│   └── geo.js               Haversine distance calculation for "distance away"
+│   └── geo.js                 Haversine distance calculation
+│
 ├── scripts/
-│   └── migrate-adoptions-to-pets.js  One-off data migration script
+│   └── migrate-adoptions-to-pets.js
+│
 └── constants/
-    └── defaults.js          Shared constants (default avatar, JWT secret)
+    └── defaults.js             Default avatar, shared JWT secret
 ```
 
-## 🚀 Getting started
+---
 
-### Prerequisites
+# 📱 Installation & Testing
 
-- Node.js 16+
-- A MongoDB instance (local or [Atlas](https://www.mongodb.com/atlas))
-- A [Cloudinary](https://cloudinary.com/) account (free tier is enough) for image uploads
+## Try it live
 
-### Install
+The live API backs the deployed frontend:
+
+https://beautifulsouls.vercel.app/login
+
+## Prerequisites
+
+* Node.js 16+
+* A MongoDB instance (local or [Atlas](https://www.mongodb.com/atlas))
+* A [Cloudinary](https://cloudinary.com/) account (free tier is enough) for image uploads
+
+---
+
+# 🧪 Development Testing
+
+Install dependencies:
 
 ```bash
 npm install
 ```
-
-### Environment variables
 
 Create a `.env` file in the project root:
 
@@ -65,9 +176,9 @@ CLOUDINARY_KEY=your-cloudinary-api-key
 CLOUDINARY_SECRET=your-cloudinary-api-secret
 ```
 
-`JWT_SECRET` falls back to a hardcoded value if unset — **always set it explicitly in production**, since it's used to both sign and verify tokens (REST routes and the Socket.IO handshake share the same secret).
+> `JWT_SECRET` falls back to a hardcoded value if unset — **always set it explicitly in production**, since it signs and verifies both REST tokens and the Socket.IO handshake.
 
-### Run
+Run the server:
 
 ```bash
 npm run dev     # nodemon, auto-restarts on change
@@ -76,13 +187,15 @@ npm start       # plain node
 
 The API listens on `http://localhost:3001` (or `PORT`), mounted under `/api`.
 
-### Migration script
+One-off migration script:
 
 ```bash
-npm run migrate:pets   # one-off: migrates legacy Adoption records into the Pet collection
+npm run migrate:pets   # migrates legacy Adoption records into the Pet collection
 ```
 
-## 📡 API routes
+---
+
+# 📡 API Routes
 
 All routes are prefixed with `/api`. Routes marked 🔒 require `Authorization: Bearer <token>`.
 
@@ -96,7 +209,7 @@ All routes are prefixed with `/api`. Routes marked 🔒 require `Authorization: 
 | PUT | `/users/:id` | 🔒 Edit your own profile (multipart, optional `image`) |
 | DELETE | `/users/:id/delete` | 🔒 Delete your account |
 | GET | `/profile` | 🔒 Pets you've liked |
-| GET | `/adoptions` | 🔒 Swipe deck: available pets (excludes your own, already liked/disliked); `?lat=&lng=` for distance sorting |
+| GET | `/adoptions` | 🔒 Swipe deck; `?lat=&lng=` for distance sorting |
 | POST | `/adoptions/create` | 🔒 Create a pet listing (multipart, up to 4 `images`) |
 | GET | `/adoptions/:id` | Pet detail |
 | POST | `/adoptions/:id` | 🔒 Edit a pet you own |
@@ -106,31 +219,32 @@ All routes are prefixed with `/api`. Routes marked 🔒 require `Authorization: 
 | POST | `/adopted/create` | 🔒 Share a pet story (multipart, optional `image`) |
 | GET | `/like` | 🔒 List of pets you've liked |
 | POST | `/like/:id` | 🔒 Toggle like on a pet |
-| POST | `/dislike/:id` | 🔒 Dislike (pass on) a pet |
-| GET | `/notifications` | 🔒 Your notifications (likes, messages, publish confirmations) |
+| POST | `/dislike/:id` | 🔒 Pass on a pet |
+| GET | `/notifications` | 🔒 Your notifications |
 | DELETE | `/notifications` | 🔒 Clear all your notifications |
 | GET | `/chat/list` | 🔒 Your conversations, one per (other user, pet) |
 | GET | `/chat/:userId/:petId` | 🔒 Message history for a specific conversation |
 | POST | `/chat/create` | 🔒 Send a message (`{ receiver, pet, msg }`) |
 
-## 🔌 Real-time chat (Socket.IO)
+---
 
-- The client authenticates the socket handshake with the same JWT used for REST calls (`io(url, { auth: { token } })`).
-- Each connected user joins a room named after their own user id.
-- On sending a message, the server emits `message:new` to both the sender's and receiver's rooms.
-- Clients can emit `typing` (`{ to, pet }`) to show a live typing indicator to the other participant.
+# 🚀 Future Improvements
 
-Conversations are always scoped to a specific **(user, pet)** pair — the `Message` model stores a `pet` reference alongside `sender`/`receiver`, so the same two people can have separate threads about different pets.
+* Rate limiting on auth and messaging endpoints.
+* Read receipts for messages.
+* Push notifications (web push).
+* Admin endpoint to verify shelter accounts.
+* Pagination cursors instead of page/limit on the swipe deck.
+* Automated tests for controllers and sockets.
 
-## 🗄 Data models (summary)
+---
 
-- **User** — auth + profile fields, `accountType` (`individual`/`shelter`), `shelterVerified`.
-- **Pet** — species, traits, health, compatibility, `images[]`, `location` (with 2dsphere index for distance queries), `owner` ref.
-- **Like** / **Dislike** — join tables between `User` and `Pet` (swipe history).
-- **Message** — `sender`, `receiver`, `pet`, `msg`, timestamps.
-- **Notification** — `type` (`Like` | `Message` | `Post`), `user` (who triggered it), `receiver`.
-- **Adopted** — community story posts (`petName`, `image`, `content`).
+# 🎯 Project Goal
 
-## 🚢 Deployment
+This API was built to support a full-stack, mobile-first adoption app end to end: authentication, image uploads, geolocation-aware queries, a like/dislike-driven discovery feed, and real-time messaging scoped intelligently per conversation — so a user talking about two different pets with the same person never gets those threads mixed up.
 
-Deployed on [Vercel](https://vercel.com/). Make sure all environment variables above are set in the project settings, and that the frontend's `REACT_APP_API_URL` points at this deployment's `/api` base.
+---
+
+# 👩‍💻 Author
+
+**Violeta Atkinson**
